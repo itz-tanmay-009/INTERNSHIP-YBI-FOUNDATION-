@@ -1,48 +1,25 @@
-def validate_dataset(df):
-    """Validate the structure and values of the student dataset."""
+"""Project configuration settings for student performance analysis."""
 
-    required_columns = {
-        "Student_ID",
-        "Study_Hours",
-        "Attendance",
-        "Assignment_Score",
-        "Previous_Marks",
-        "Final_Marks"
-    }
+# Project information
+PROJECT_NAME = "Student Performance Analysis"
 
-    # Check required columns
-    missing_columns = required_columns - set(df.columns)
+# Performance thresholds
+EXCELLENT_MARKS = 85
+GOOD_MARKS = 70
+MINIMUM_PASSING_MARKS = 40
 
-    if missing_columns:
-        raise ValueError(
-            "Missing required columns: "
-            + ", ".join(sorted(missing_columns))
-        )
+# Data validation limits
+MIN_MARKS = 0
+MAX_MARKS = 100
 
-    # Check for empty dataset
-    if df.empty:
-        raise ValueError("The student dataset is empty.")
+MIN_ATTENDANCE = 0
+MAX_ATTENDANCE = 100
 
-    # Check for duplicate student IDs
-    if df["Student_ID"].duplicated().any():
-        raise ValueError("Duplicate Student_ID values found.")
+MIN_STUDY_HOURS = 0
 
-    # Check marks are within valid range
-    if not df["Final_Marks"].between(0, 100).all():
-        raise ValueError("Final marks must be between 0 and 100.")
-
-    if not df["Previous_Marks"].between(0, 100).all():
-        raise ValueError("Previous marks must be between 0 and 100.")
-
-    if not df["Assignment_Score"].between(0, 100).all():
-        raise ValueError("Assignment scores must be between 0 and 100.")
-
-    # Check attendance is within valid range
-    if not df["Attendance"].between(0, 100).all():
-        raise ValueError("Attendance must be between 0 and 100.")
-
-    # Check study hours
-    if (df["Study_Hours"] < 0).any():
-        raise ValueError("Study hours cannot be negative.")
-
-    return True
+# Supported performance categories
+SUPPORTED_CATEGORIES = [
+    "Excellent",
+    "Good",
+    "Needs Improvement"
+]
