@@ -1,4 +1,7 @@
+"""Visualization functions for student performance analysis."""
+
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 def plot_relationship(df, x_column, x_label, title):
@@ -67,6 +70,37 @@ def plot_performance_categories(df):
     plt.show()
 
 
+def plot_final_marks_distribution(df):
+    """Show the number of students in different final-mark ranges."""
+
+    bins = [0, 40, 60, 80, 101]
+    labels = ["0–39", "40–59", "60–79", "80–100"]
+
+    mark_ranges = pd.cut(
+        df["Final_Marks"],
+        bins=bins,
+        labels=labels,
+        right=False
+    )
+
+    range_counts = mark_ranges.value_counts().reindex(
+        labels,
+        fill_value=0
+    )
+
+    plt.figure(figsize=(8, 5))
+    range_counts.plot(kind="bar")
+
+    plt.xlabel("Final Marks Range")
+    plt.ylabel("Number of Students")
+    plt.title("Final Marks Distribution")
+
+    plt.xticks(rotation=0)
+    plt.grid(axis="y")
+    plt.tight_layout()
+    plt.show()
+
+
 def create_all_visualizations(df):
     """Generate all student performance visualizations."""
 
@@ -74,3 +108,4 @@ def create_all_visualizations(df):
     plot_attendance_vs_marks(df)
     plot_assignment_vs_marks(df)
     plot_performance_categories(df)
+    plot_final_marks_distribution(df)
