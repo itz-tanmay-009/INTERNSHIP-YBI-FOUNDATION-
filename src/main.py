@@ -8,13 +8,17 @@ from analysis import (
     calculate_correlation,
     determine_class_performance,
     find_students_needing_improvement,
-    calculate_performance_statistics
+    calculate_performance_statistics,
+    calculate_pass_percentage
 )
 from visualization import create_all_visualizations
 
 
-def display_performance_summary(df, averages, class_level):
+def display_performance_summary(
+    df, averages, class_level, pass_percentage
+):
     """Display the final summary of student performance."""
+
     students_needing_improvement = (
         df["Performance_Category"] == "Needs Improvement"
     ).sum()
@@ -26,6 +30,7 @@ def display_performance_summary(df, averages, class_level):
     print(f"Average Final Marks           : {averages['average_final']:.2f}")
     print(f"Highest Final Marks           : {df['Final_Marks'].max()}")
     print(f"Lowest Final Marks            : {df['Final_Marks'].min()}")
+    print(f"Pass Percentage               : {pass_percentage:.2f}%")
     print(
         f"Students Needing Improvement : "
         f"{students_needing_improvement}"
@@ -35,6 +40,7 @@ def display_performance_summary(df, averages, class_level):
 
 def display_statistical_analysis(statistics):
     """Display additional statistical measures for final marks."""
+
     print("\n[10] ADDITIONAL STATISTICAL ANALYSIS")
     print("-" * 55)
     print(
@@ -57,6 +63,7 @@ def display_statistical_analysis(statistics):
 
 def display_completion_summary():
     """Display a message confirming successful analysis completion."""
+
     print("\n" + "=" * 55)
     print("             ANALYSIS COMPLETED")
     print("=" * 55)
@@ -65,7 +72,8 @@ def display_completion_summary():
     print("Statistical analysis completed.")
     print("Performance classification completed.")
     print("Correlation analysis completed.")
-    print("Three visualizations generated.")
+    print("Pass percentage calculated.")
+    print("Visualizations generated.")
     print("Final performance summary generated.")
     print("=" * 55)
 
@@ -169,6 +177,9 @@ def main():
     # Display additional statistics
     display_statistical_analysis(performance_statistics)
 
+    # Calculate pass percentage
+    pass_percentage = calculate_pass_percentage(df)
+
     # Determine overall class performance
     class_level = determine_class_performance(
         averages["average_final"]
@@ -178,7 +189,8 @@ def main():
     display_performance_summary(
         df,
         averages,
-        class_level
+        class_level,
+        pass_percentage
     )
 
     # Display completion message
