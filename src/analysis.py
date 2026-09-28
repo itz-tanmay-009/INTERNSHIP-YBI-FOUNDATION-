@@ -1,3 +1,8 @@
+"""Functions for analyzing student academic performance."""
+
+from validation import MINIMUM_PASSING_MARKS
+
+
 def calculate_averages(df):
     """Calculate average values for key student performance metrics."""
     return {
@@ -83,3 +88,17 @@ def calculate_performance_statistics(df):
         "minimum_final": df["Final_Marks"].min(),
         "maximum_final": df["Final_Marks"].max()
     }
+
+
+def calculate_pass_percentage(df):
+    """Calculate the percentage of students who meet the passing mark."""
+    total_students = len(df)
+
+    if total_students == 0:
+        return 0.0
+
+    passed_students = (
+        df["Final_Marks"] >= MINIMUM_PASSING_MARKS
+    ).sum()
+
+    return (passed_students / total_students) * 100
