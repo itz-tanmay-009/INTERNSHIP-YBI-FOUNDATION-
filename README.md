@@ -1,3 +1,15 @@
+## Data Validation
+
+The project checks the dataset before performing analysis.
+
+- Confirms that all required columns are present.
+- Checks that the dataset is not empty.
+- Prevents duplicate student IDs.
+- Ensures marks are between 0 and 100.
+- Checks that attendance is between 0 and 100.
+- Ensures study hours are not negative.
+
+These checks help identify invalid data before analysis begins.
 # Student Performance Analysis Using Python
 
 A Python-based data analysis project that examines student academic performance using study hours, attendance, assignment scores, previous marks, and final examination marks.
