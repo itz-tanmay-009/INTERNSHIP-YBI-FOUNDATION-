@@ -1,5 +1,7 @@
 """Generate a text report for student performance analysis."""
 
+from validation import MINIMUM_PASSING_MARKS
+
 
 def generate_report(df, output_file="student_performance_report.txt"):
     """Create and save a summary report from the student dataset."""
@@ -22,6 +24,10 @@ def generate_report(df, output_file="student_performance_report.txt"):
     highest = df.loc[df["Final_Marks"].idxmax()]
     lowest = df.loc[df["Final_Marks"].idxmin()]
 
+    passed = df["Final_Marks"].ge(MINIMUM_PASSING_MARKS).sum()
+    failed = len(df) - passed
+    pass_percentage = (passed / len(df)) * 100
+
     lines = [
         "STUDENT PERFORMANCE REPORT",
         "=" * 35,
@@ -30,6 +36,11 @@ def generate_report(df, output_file="student_performance_report.txt"):
         f"Average attendance: {df['Attendance'].mean():.2f}%",
         f"Average assignment score: {df['Assignment_Score'].mean():.2f}",
         f"Average final marks: {df['Final_Marks'].mean():.2f}",
+        "",
+        "PASS / FAIL SUMMARY",
+        f"Passed students: {passed}",
+        f"Failed students: {failed}",
+        f"Pass percentage: {pass_percentage:.2f}%",
         "",
         "TOP PERFORMANCE",
         f"Student ID: {int(highest['Student_ID'])}",
