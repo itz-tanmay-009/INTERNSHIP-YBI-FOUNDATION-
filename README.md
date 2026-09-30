@@ -1,53 +1,31 @@
-## Data Validation
-
-The project checks the dataset before performing analysis.
-
-- Confirms that all required columns are present.
-- Checks that the dataset is not empty.
-- Prevents duplicate student IDs.
-- Ensures marks are between 0 and 100.
-- Checks that attendance is between 0 and 100.
-- Ensures study hours are not negative.
-
-These checks help identify invalid data before analysis begins.
 # Student Performance Analysis Using Python
 
-A Python-based data analysis project that examines student academic performance using study hours, attendance, assignment scores, previous marks, and final examination marks.
+A Python-based data analysis project that explores student academic performance using study hours, attendance, assignment scores, previous marks, and final marks.
+
+The project uses **Pandas, NumPy, and Matplotlib** to organize, analyze, and visualize student data. It also includes validation and reporting utilities to make the analysis more structured and reliable.
 
 ---
 
 ## Project Overview
 
-**Student Performance Analysis Using Python** is a data analysis project developed as part of a Python Programming for AI & Data Science internship.
+Understanding student performance can help identify academic patterns and areas that may need improvement.
 
-The project uses Python and popular data analysis and visualization libraries to process a student dataset, calculate statistical measures, identify performance patterns, analyze correlations, classify students based on their final marks, and visualize the results.
+This project analyzes a sample student dataset to explore how different academic factors relate to final marks. It calculates summary statistics, identifies students with the highest and lowest marks, categorizes performance, and creates visualizations.
 
-The project demonstrates practical applications of Python in:
-
-- Data handling
-- Data analysis
-- Statistical calculations
-- Correlation analysis
-- Data visualization
-- Performance classification
-- CSV data export
+> **Dataset note:** The project uses 20 manually created sample student records for educational and demonstration purposes. The results should not be interpreted as findings about a real student population.
 
 ---
 
-## Project Objectives
+## Objectives
 
-The main objectives of this project are:
-
-1. Analyze student academic performance using Python.
-2. Examine the relationship between study hours and final marks.
-3. Analyze the relationship between attendance and academic performance.
-4. Study the relationship between assignment scores and final marks.
-5. Compare previous marks with final examination performance.
-6. Calculate important statistical measures.
-7. Identify the highest and lowest performing students.
-8. Classify students into performance categories.
-9. Generate visual representations of the analysis.
-10. Export the analyzed dataset to a CSV file.
+- Analyze student academic performance using Python.
+- Calculate average study hours, attendance, assignment scores, and final marks.
+- Identify students with the highest and lowest final marks.
+- Categorize students based on their final marks.
+- Examine relationships between academic variables.
+- Visualize patterns using charts.
+- Validate input data before analysis.
+- Generate structured reports and grade summaries.
 
 ---
 
@@ -56,57 +34,14 @@ The main objectives of this project are:
 | Technology | Purpose |
 |---|---|
 | Python | Core programming language |
-| Pandas | Data manipulation and analysis |
+| Pandas | Data handling and analysis |
 | NumPy | Numerical operations |
 | Matplotlib | Data visualization |
-| Google Colab | Notebook-based development |
-| Git | Version control |
-| GitHub | Source code hosting |
+| Jupyter Notebook / Google Colab | Interactive analysis |
+| Git and GitHub | Version control and project hosting |
 
 ---
 
-## Dataset
+## Dataset Description
 
-The project uses a manually created synthetic dataset containing information about **20 students**.
-
-The dataset includes the following attributes:
-
-| Column | Description |
-|---|---|
-| `Student_ID` | Unique identifier for each student |
-| `Study_Hours` | Number of hours spent studying |
-| `Attendance` | Student attendance percentage |
-| `Assignment_Score` | Assignment performance score |
-| `Previous_Marks` | Marks obtained in previous examinations |
-| `Final_Marks` | Final examination marks |
-
-### Dataset Characteristics
-
-- Total students: **20**
-- Total attributes: **6**
-- Final marks range: **47–97**
-- Study hours range: **1–9 hours**
-- Attendance range: **60–98%**
-
-> **Note:** The dataset is synthetic and manually created for educational and demonstration purposes. It does not represent real student records.
-
----
-
-## Project Structure
-
-```text
-Student_Performance_Analysis/
-│
-├── README.md
-├── requirements.txt
-├── .gitignore
-│
-├── notebook/
-│   └── Student_Performance_Analysis.ipynb
-│
-└── src/
-    ├── main.py
-    ├── data.py
-    ├── analysis.py
-    ├── visualization.py
-    └── validation.py
+The dataset contains 20 sample student records
