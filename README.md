@@ -1,47 +1,99 @@
 # Student Performance Analysis Using Python
 
-A Python-based data analysis project that explores student academic performance using study hours, attendance, assignment scores, previous marks, and final marks.
-
-The project uses **Pandas, NumPy, and Matplotlib** to organize, analyze, and visualize student data. It also includes validation and reporting utilities to make the analysis more structured and reliable.
-
----
-
 ## Project Overview
 
-Understanding student performance can help identify academic patterns and areas that may need improvement.
+Student Performance Analysis is a Python-based data analysis project that studies students' academic performance using marks, attendance, study hours, and assignment scores.
 
-This project analyzes a sample student dataset to explore how different academic factors relate to final marks. It calculates summary statistics, identifies students with the highest and lowest marks, categorizes performance, and creates visualizations.
+The project uses Pandas, NumPy, and Matplotlib to organize, analyze, and visualize student data. It also generates reports and grade summaries to make the results easier to understand.
 
-> **Dataset note:** The project uses 20 manually created sample student records for educational and demonstration purposes. The results should not be interpreted as findings about a real student population.
+## Project Objectives
 
----
-
-## Objectives
-
-- Analyze student academic performance using Python.
-- Calculate average study hours, attendance, assignment scores, and final marks.
-- Identify students with the highest and lowest final marks.
-- Categorize students based on their final marks.
-- Examine relationships between academic variables.
-- Visualize patterns using charts.
-- Validate input data before analysis.
-- Generate structured reports and grade summaries.
-
----
+- Analyze students' academic performance.
+- Calculate average marks and attendance.
+- Identify the highest- and lowest-performing students.
+- Group students based on their final marks.
+- Study the relationship between study hours, attendance, and marks.
+- Generate charts and summary reports.
+- Export analysis results into CSV files.
 
 ## Technologies Used
 
-| Technology | Purpose |
+- Python
+- Pandas
+- NumPy
+- Matplotlib
+- Google Colab
+- Git and GitHub
+
+## Project Features
+
+### 1. Data Management
+Stores student information, including student ID, study hours, attendance, assignment marks, and final marks.
+
+### 2. Data Analysis
+Calculates:
+- Average final marks
+- Average study hours
+- Average attendance
+- Highest and lowest marks
+- Student performance categories
+- Pass and fail statistics
+- Correlation between numerical columns
+
+### 3. Data Validation
+Checks the dataset for:
+- Missing required columns
+- Empty data
+- Duplicate student IDs
+- Invalid marks
+- Invalid attendance values
+- Negative study hours
+
+### 4. Data Visualization
+Creates charts to present student performance, including:
+- Performance category chart
+- Final marks distribution
+- Study hours versus final marks
+- Attendance versus final marks
+- Grade distribution
+
+### 5. Grade Classification
+
+Students are assigned grades according to their final marks:
+
+| Grade | Marks Range |
 |---|---|
-| Python | Core programming language |
-| Pandas | Data handling and analysis |
-| NumPy | Numerical operations |
-| Matplotlib | Data visualization |
-| Jupyter Notebook / Google Colab | Interactive analysis |
-| Git and GitHub | Version control and project hosting |
+| A | 90–100 |
+| B | 80–89 |
+| C | 70–79 |
+| D | 40–69 |
+| F | Below 40 |
 
----
+The project calculates the number and percentage of students in each grade.
 
-## Dataset Description
+### 6. Report Generation
+Generates a summary report containing important performance statistics, including pass and fail information.
 
-The dataset contains 20 sample student records
+### 7. CSV Export
+The project can save grade summaries and individual student grades as CSV files.
+
+## Project Structure
+
+```text
+Student_Performance_Analysis/
+│
+├── README.md
+├── requirements.txt
+├── .gitignore
+│
+├── src/
+│   ├── main.py
+│   ├── data.py
+│   ├── analysis.py
+│   ├── visualization.py
+│   ├── validation.py
+│   ├── report.py
+│   └── grade_summary.py
+│
+└── notebook/
+    └── Student_Performance_Analysis.ipynb
