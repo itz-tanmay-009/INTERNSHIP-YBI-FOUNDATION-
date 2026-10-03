@@ -1,5 +1,10 @@
+"""Main program for Student Performance Analysis."""
+
 from data import create_student_dataset
-from validation import validate_dataset
+from validation import (
+    validate_dataset,
+    generate_data_quality_summary,
+)
 from analysis import (
     calculate_averages,
     find_top_and_lowest_students,
@@ -9,9 +14,18 @@ from analysis import (
     determine_class_performance,
     find_students_needing_improvement,
     calculate_performance_statistics,
-    calculate_pass_percentage
+    calculate_pass_percentage,
 )
-from visualization import create_all_visualizations
+from grade_summary import (
+    create_grade_summary,
+    save_grade_summary,
+    save_student_grades,
+)
+from report import generate_report
+from visualization import (
+    create_all_visualizations,
+    plot_grade_distribution,
+)
 
 
 def display_performance_summary(
@@ -43,22 +57,42 @@ def display_statistical_analysis(statistics):
 
     print("\n[10] ADDITIONAL STATISTICAL ANALYSIS")
     print("-" * 55)
-    print(
-        f"Median Final Marks            : "
-        f"{statistics['median_final']:.2f}"
-    )
-    print(
-        f"Standard Deviation            : "
-        f"{statistics['std_final']:.2f}"
-    )
-    print(
-        f"Minimum Final Marks           : "
-        f"{statistics['minimum_final']:.2f}"
-    )
-    print(
-        f"Maximum Final Marks           : "
-        f"{statistics['maximum_final']:.2f}"
-    )
+    print(f"Median Final Marks            : {statistics['median_final']:.2f}")
+    print(f"Standard Deviation            : {statistics['std_final']:.2f}")
+    print(f"Minimum Final Marks           : {statistics['minimum_final']:.2f}")
+    print(f"Maximum Final Marks           : {statistics['maximum_final']:.2f}")
+
+
+def display_grade_summary(grade_counts):
+    """Display the number of students in each grade."""
+
+    print("\n[11] GRADE SUMMARY")
+    print("-" * 55)
+
+    total_students = grade_counts.sum()
+
+    for grade, count in grade_counts.items():
+        percentage = (
+            count / total_students * 100
+            if total_students > 0
+            else 0
+        )
+        print(
+            f"Grade {grade:<15}: {count} student(s) "
+            f"({percentage:.1f}%)"
+        )
+
+
+def display_data_quality_summary(summary):
+    """Display the results of dataset quality checks."""
+
+    print("\n[2.1] DATA QUALITY SUMMARY")
+    print("-" * 55)
+    print(f"Total Rows             : {summary['total_rows']}")
+    print(f"Total Columns          : {summary['total_columns']}")
+    print(f"Missing Values         : {summary['missing_values']}")
+    print(f"Duplicate Student IDs  : {summary['duplicate_student_ids']}")
+    print(f"Data Quality Status    : {summary['data_quality_status']}")
 
 
 def display_completion_summary():
@@ -71,9 +105,12 @@ def display_completion_summary():
     print("Dataset processed successfully.")
     print("Statistical analysis completed.")
     print("Performance classification completed.")
+    print("Grade classification completed.")
     print("Correlation analysis completed.")
     print("Pass percentage calculated.")
     print("Visualizations generated.")
+    print("CSV files exported.")
+    print("Text report generated.")
     print("Final performance summary generated.")
     print("=" * 55)
 
@@ -81,27 +118,31 @@ def display_completion_summary():
 def main():
     """Run the complete student performance analysis."""
 
-    # Create the student dataset
+    # 1. Create the student dataset
     df = create_student_dataset()
 
-    # Validate the dataset before analysis
+    # 2. Validate the dataset
     validate_dataset(df)
 
     print("\n" + "=" * 55)
     print("          STUDENT PERFORMANCE ANALYSIS")
     print("=" * 55)
 
-    # Display the dataset
+    # 3. Display the dataset
     print("\n[1] STUDENT DATASET")
     print("-" * 55)
     print(df)
 
-    # Display statistical summary
+    # 4. Display dataset statistics
     print("\n[2] DATASET SUMMARY")
     print("-" * 55)
     print(df.describe())
 
-    # Calculate average performance
+    # 5. Display data quality information
+    quality_summary = generate_data_quality_summary(df)
+    display_data_quality_summary(quality_summary)
+
+    # 6. Calculate average performance
     averages = calculate_averages(df)
 
     print("\n[3] AVERAGE PERFORMANCE")
@@ -117,7 +158,7 @@ def main():
         f"{averages['average_assignment']:.2f}"
     )
 
-    # Find highest and lowest performing students
+    # 7. Find highest and lowest performing students
     highest_student, lowest_student = find_top_and_lowest_students(df)
 
     print("\n[4] HIGHEST PERFORMING STUDENT")
@@ -128,7 +169,7 @@ def main():
     print("-" * 55)
     print(lowest_student)
 
-    # Add performance categories
+    # 8. Add performance categories
     df = add_performance_category(df)
 
     print("\n[6] PERFORMANCE CATEGORIES")
@@ -139,21 +180,20 @@ def main():
         ]
     )
 
-    # Find students needing improvement
+    # 9. Find students needing improvement
     students_needing_improvement = find_students_needing_improvement(df)
 
     print("\n[6.1] STUDENTS NEEDING IMPROVEMENT")
     print("-" * 55)
     print(students_needing_improvement)
 
-    # Calculate category statistics
+    # 10. Calculate category statistics
     category_counts, category_percentages = (
         calculate_category_statistics(df)
     )
 
     print("\n[7] CATEGORY STATISTICS")
     print("-" * 55)
-
     print("Category Count:")
     print(category_counts)
 
@@ -161,39 +201,64 @@ def main():
     for category, percentage in category_percentages.items():
         print(f"{category:<20}: {percentage:.1f}%")
 
-    # Calculate correlations
+    # 11. Calculate correlations
     print("\n[8] CORRELATION WITH FINAL MARKS")
     print("-" * 55)
     print(calculate_correlation(df))
 
-    # Generate visualizations
+    # 12. Add grades and calculate grade summary
+    df, grade_counts = create_grade_summary(df)
+    display_grade_summary(grade_counts)
+
+    # 13. Generate visualizations
     print("\n[9] GENERATING VISUALIZATIONS")
     print("-" * 55)
     create_all_visualizations(df)
+    plot_grade_distribution(df)
 
-    # Calculate additional statistics
+    # 14. Calculate additional statistics
     performance_statistics = calculate_performance_statistics(df)
-
-    # Display additional statistics
     display_statistical_analysis(performance_statistics)
 
-    # Calculate pass percentage
+    # 15. Calculate pass percentage
     pass_percentage = calculate_pass_percentage(df)
 
-    # Determine overall class performance
+    # 16. Determine overall class performance
     class_level = determine_class_performance(
         averages["average_final"]
     )
 
-    # Display final summary
+    # 17. Display final performance summary
     display_performance_summary(
         df,
         averages,
         class_level,
-        pass_percentage
+        pass_percentage,
     )
 
-    # Display completion message
+    # 18. Export grade summaries
+    grade_summary_file = save_grade_summary(
+        grade_counts,
+        "grade_summary.csv",
+    )
+    student_grades_file = save_student_grades(
+        df,
+        "student_grades.csv",
+    )
+
+    # 19. Generate text report
+    report_file = generate_report(
+        df,
+        "student_performance_report.txt",
+    )
+
+    print("\n[12] GENERATED FILES")
+    print("-" * 55)
+    print(f"Grade Summary CSV       : {grade_summary_file}")
+    print(f"Student Grades CSV      : {student_grades_file}")
+    print(f"Performance Report      : {report_file}")
+
+    # 20. Display completion message
     display_completion_summary()
 
 
