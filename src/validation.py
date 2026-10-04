@@ -1,5 +1,9 @@
 """Project settings and dataset validation functions."""
 
+import numpy as np
+import pandas as pd
+
+
 # Project information
 PROJECT_NAME = "Student Performance Analysis"
 
@@ -21,22 +25,24 @@ MIN_STUDY_HOURS = 0
 SUPPORTED_CATEGORIES = [
     "Excellent",
     "Good",
-    "Needs Improvement"
+    "Needs Improvement",
+]
+
+# Required numeric columns
+NUMERIC_COLUMNS = [
+    "Student_ID",
+    "Study_Hours",
+    "Attendance",
+    "Assignment_Score",
+    "Previous_Marks",
+    "Final_Marks",
 ]
 
 
 def validate_dataset(df):
     """Validate the structure and values of the student dataset."""
 
-    required_columns = {
-        "Student_ID",
-        "Study_Hours",
-        "Attendance",
-        "Assignment_Score",
-        "Previous_Marks",
-        "Final_Marks"
-    }
-
+    required_columns = set(NUMERIC_COLUMNS)
     missing_columns = required_columns - set(df.columns)
 
     if missing_columns:
@@ -47,13 +53,39 @@ def validate_dataset(df):
     if df.empty:
         raise ValueError("The dataset is empty.")
 
+    # Check for missing values
+    missing_values = df[NUMERIC_COLUMNS].isnull().sum()
+    columns_with_missing_values = missing_values[
+        missing_values > 0
+    ]
+
+    if not columns_with_missing_values.empty:
+        raise ValueError(
+            "Missing values found: "
+            f"{columns_with_missing_values.to_dict()}"
+        )
+
+    # Check that required columns contain numeric data
+    for column in NUMERIC_COLUMNS:
+        if not pd.api.types.is_numeric_dtype(df[column]):
+            raise ValueError(
+                f"{column} must contain numeric values."
+            )
+
+        if not np.isfinite(df[column]).all():
+            raise ValueError(
+                f"{column} must contain only finite values."
+            )
+
+    # Check for duplicate student IDs
     if df["Student_ID"].duplicated().any():
         raise ValueError("Duplicate student IDs found.")
 
+    # Validate marks
     marks_columns = [
         "Assignment_Score",
         "Previous_Marks",
-        "Final_Marks"
+        "Final_Marks",
     ]
 
     for column in marks_columns:
@@ -63,13 +95,16 @@ def validate_dataset(df):
                 f"{MIN_MARKS} and {MAX_MARKS}."
             )
 
+    # Validate attendance
     if not df["Attendance"].between(
-        MIN_ATTENDANCE, MAX_ATTENDANCE
+        MIN_ATTENDANCE,
+        MAX_ATTENDANCE,
     ).all():
         raise ValueError(
             "Attendance must be between 0 and 100."
         )
 
+    # Validate study hours
     if (df["Study_Hours"] < MIN_STUDY_HOURS).any():
         raise ValueError("Study hours cannot be negative.")
 
