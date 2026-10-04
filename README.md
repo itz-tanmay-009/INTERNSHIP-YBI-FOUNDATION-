@@ -1,90 +1,61 @@
 # Student Performance Analysis Using Python
 
 ## Project Overview
+Student Performance Analysis is a Python-based data analysis project that studies students' academic performance using different factors such as study hours, attendance, assignment scores, previous marks, and final marks.
 
-Student Performance Analysis is a Python-based data analysis project that studies students' academic performance using marks, attendance, study hours, and assignment scores.
-
-The project uses Pandas, NumPy, and Matplotlib to organize, analyze, and visualize student data. It also generates reports and grade summaries to make the results easier to understand.
+The project uses Python libraries to clean, validate, analyse, and visualize student data. It also generates performance summaries and reports to make the results easier to understand.
 
 ## Project Objectives
-
-- Analyze students' academic performance.
-- Calculate average marks and attendance.
-- Identify the highest- and lowest-performing students.
-- Group students based on their final marks.
-- Study the relationship between study hours, attendance, and marks.
-- Generate charts and summary reports.
-- Export analysis results into CSV files.
+- Analyse students' academic performance.
+- Understand the relationship between study hours, attendance, and final marks.
+- Identify students with the highest and lowest marks.
+- Classify students based on their performance.
+- Generate visualizations and summary reports.
 
 ## Technologies Used
-
-- Python
-- Pandas
-- NumPy
-- Matplotlib
-- Google Colab
-- Git and GitHub
+- **Python** – Main programming language
+- **Pandas** – Data handling and analysis
+- **NumPy** – Numerical operations
+- **Matplotlib** – Data visualization
 
 ## Project Features
+- Student dataset creation and management
+- Dataset validation and data quality checks
+- Calculation of average marks and other statistics
+- Identification of highest- and lowest-performing students
+- Performance classification
+- Grade summary and pass/fail analysis
+- Charts for understanding student performance
+- Automatic generation of a project report
 
-### 1. Data Management
-Stores student information, including student ID, study hours, attendance, assignment marks, and final marks.
+## Project Workflow
+1. Create and load the student dataset.
+2. Validate the data and check for errors.
+3. Analyse academic performance using Python.
+4. Classify students based on their marks.
+5. Generate charts and visual summaries.
+6. Prepare a final performance report.
 
-### 2. Data Analysis
-Calculates:
-- Average final marks
-- Average study hours
-- Average attendance
-- Highest and lowest marks
-- Student performance categories
-- Pass and fail statistics
-- Correlation between numerical columns
+## Dataset Information
+The project uses a sample dataset containing 20 student records.
 
-### 3. Data Validation
-Checks the dataset for:
-- Missing required columns
-- Empty data
-- Duplicate student IDs
-- Invalid marks
-- Invalid attendance values
-- Negative study hours
+The dataset includes:
+- Student ID
+- Study Hours
+- Attendance
+- Assignment Score
+- Previous Marks
+- Final Marks
 
-### 4. Data Visualization
-Creates charts to present student performance, including:
-- Performance category chart
-- Final marks distribution
-- Study hours versus final marks
-- Attendance versus final marks
-- Grade distribution
-
-### 5. Grade Classification
-
-Students are assigned grades according to their final marks:
-
-| Grade | Marks Range |
-|---|---|
-| A | 90–100 |
-| B | 80–89 |
-| C | 70–79 |
-| D | 40–69 |
-| F | Below 40 |
-
-The project calculates the number and percentage of students in each grade.
-
-### 6. Report Generation
-Generates a summary report containing important performance statistics, including pass and fail information.
-
-### 7. CSV Export
-The project can save grade summaries and individual student grades as CSV files.
+**Note:** The dataset is created for educational and demonstration purposes. It is not real institutional student data. Therefore, the analysis results should not be treated as conclusions about an actual student population.
 
 ## Project Structure
 
 ```text
 Student_Performance_Analysis/
 │
-├── README.md
-├── requirements.txt
-├── .gitignore
+├── notebook/
+│   └── Student_Performance_Analysis.ipynb
 │
 ├── src/
 │   ├── main.py
@@ -95,5 +66,56 @@ Student_Performance_Analysis/
 │   ├── report.py
 │   └── grade_summary.py
 │
-└── notebook/
-    └── Student_Performance_Analysis.ipynb
+├── .gitignore
+├── README.md
+└── requirements.txt
+```
+
+## Installation and Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/itz-tanmay-009/YBI-Foundation-Internship.git
+```
+
+### 2. Open the project folder
+
+```bash
+cd YBI-Foundation-Internship
+```
+
+### 3. Install the required libraries
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run the project
+
+```bash
+python src/main.py
+```
+
+## Google Colab Notebook
+The project was also developed using Google Colab.
+
+[Open Student Performance Analysis Notebook](https://colab.research.google.com/drive/1G4ios8vYG3oFUhDXttACsuwVUzAyZmPF?usp=sharing)
+
+## Learning Outcomes
+Through this project, I practised:
+- Python programming
+- Data handling using Pandas
+- Numerical operations using NumPy
+- Data visualization using Matplotlib
+- Data validation and analysis
+- Working with Python modules
+- Generating reports from data
+
+## Author
+**Tanmay Kumar Mallick**
+
+BCA Student | Python Programming | Data Analysis
+
+## Internship
+This project was developed as part of the **YBI Foundation – Python Programming for AI & Data Science Internship**.
