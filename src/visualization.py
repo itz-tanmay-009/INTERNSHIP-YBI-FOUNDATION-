@@ -55,6 +55,17 @@ def plot_assignment_vs_marks(df):
     )
 
 
+def plot_previous_vs_final_marks(df):
+    """Show the relationship between previous and final marks."""
+
+    plot_scatter(
+        df,
+        "Previous_Marks",
+        "Final_Marks",
+        "Previous Marks vs Final Marks"
+    )
+
+
 def plot_performance_categories(df):
     """Display the number of students in each performance category."""
 
@@ -146,5 +157,6 @@ def create_all_visualizations(df):
     plot_study_hours_vs_marks(df)
     plot_attendance_vs_marks(df)
     plot_assignment_vs_marks(df)
+    plot_previous_vs_final_marks(df)
     plot_performance_categories(df)
     plot_final_marks_distribution(df)
