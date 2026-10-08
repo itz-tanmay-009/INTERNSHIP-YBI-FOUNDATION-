@@ -110,6 +110,17 @@ def calculate_performance_statistics(df):
     }
 
 
+def calculate_average_improvement(df):
+    """Calculate the average improvement from previous to final marks."""
+
+    if df.empty:
+        return 0.0
+
+    improvement = df["Final_Marks"] - df["Previous_Marks"]
+
+    return improvement.mean()
+
+
 def calculate_pass_percentage(df):
     """Calculate the percentage of students who meet the passing mark."""
 
