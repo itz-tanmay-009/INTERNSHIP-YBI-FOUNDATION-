@@ -36,11 +36,12 @@ def assign_grade(marks):
         return "C"
     elif marks >= 40:
         return "D"
+
     return "F"
 
 
 def create_grade_summary(df):
-    """Add grades and return the student data and grade counts."""
+    """Add grades and return student data with grade statistics."""
 
     if df.empty:
         raise ValueError("Cannot create a summary from an empty dataset.")
@@ -51,20 +52,39 @@ def create_grade_summary(df):
     result = df.copy()
 
     # Validate every mark before assigning grades.
-    result["Final_Marks"] = result["Final_Marks"].apply(validate_marks)
-    result["Grade"] = result["Final_Marks"].apply(assign_grade)
+    result["Final_Marks"] = result["Final_Marks"].apply(
+        validate_marks
+    )
 
-    summary = (
+    result["Grade"] = result["Final_Marks"].apply(
+        assign_grade
+    )
+
+    # Count students in each grade.
+    grade_counts = (
         result["Grade"]
         .value_counts()
         .reindex(GRADE_ORDER, fill_value=0)
     )
 
-    return result, summary
+    # Calculate average final marks for each grade.
+    grade_average_marks = (
+        result.groupby("Grade")["Final_Marks"]
+        .mean()
+        .reindex(GRADE_ORDER)
+        .fillna(0)
+        .round(2)
+    )
+
+    return result, grade_counts, grade_average_marks
 
 
-def save_grade_summary(summary, output_file="grade_summary.csv"):
-    """Save grade counts and percentages to a CSV file."""
+def save_grade_summary(
+    summary,
+    average_marks=None,
+    output_file="grade_summary.csv"
+):
+    """Save grade counts, percentages, and average marks to CSV."""
 
     total_students = summary.sum()
 
@@ -75,17 +95,27 @@ def save_grade_summary(summary, output_file="grade_summary.csv"):
     )
 
     summary_df = summary.rename("Student_Count").to_frame()
+
     summary_df["Percentage"] = percentages.round(2)
+
+    if average_marks is not None:
+        summary_df["Average_Final_Marks"] = average_marks
+
     summary_df.index.name = "Grade"
 
     summary_df.to_csv(output_file)
+
     return output_file
 
 
-def save_student_grades(df, output_file="student_grades.csv"):
+def save_student_grades(
+    df,
+    output_file="student_grades.csv"
+):
     """Save each student's ID, final marks, and assigned grade."""
 
     required_columns = {"Student_ID", "Final_Marks"}
+
     missing_columns = required_columns - set(df.columns)
 
     if missing_columns:
@@ -93,11 +123,21 @@ def save_student_grades(df, output_file="student_grades.csv"):
             f"Missing required columns: {sorted(missing_columns)}"
         )
 
-    student_data = df[["Student_ID", "Final_Marks"]].copy()
-    student_data["Final_Marks"] = student_data["Final_Marks"].apply(
-        validate_marks
-    )
-    student_data["Grade"] = student_data["Final_Marks"].apply(assign_grade)
+    student_data = df[
+        ["Student_ID", "Final_Marks"]
+    ].copy()
 
-    student_data.to_csv(output_file, index=False)
+    student_data["Final_Marks"] = student_data[
+        "Final_Marks"
+    ].apply(validate_marks)
+
+    student_data["Grade"] = student_data[
+        "Final_Marks"
+    ].apply(assign_grade)
+
+    student_data.to_csv(
+        output_file,
+        index=False
+    )
+
     return output_file
