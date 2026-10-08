@@ -17,10 +17,12 @@ def generate_report(df, output_file="student_performance_report.txt"):
         "Study_Hours",
         "Attendance",
         "Assignment_Score",
+        "Previous_Marks",
         "Final_Marks",
     }
 
     missing_columns = required_columns - set(df.columns)
+
     if missing_columns:
         raise ValueError(
             f"Missing required columns: {sorted(missing_columns)}"
@@ -32,6 +34,18 @@ def generate_report(df, output_file="student_performance_report.txt"):
     passed = df["Final_Marks"].ge(MINIMUM_PASSING_MARKS).sum()
     failed = len(df) - passed
     pass_percentage = (passed / len(df)) * 100
+
+    # Calculate improvement from previous marks to final marks
+    improvement = df["Final_Marks"] - df["Previous_Marks"]
+
+    improved_students = (improvement > 0).sum()
+    unchanged_students = (improvement == 0).sum()
+    declined_students = (improvement < 0).sum()
+    average_improvement = improvement.mean()
+
+    most_improved_index = improvement.idxmax()
+    most_improved_student = df.loc[most_improved_index]
+    highest_improvement = improvement.loc[most_improved_index]
 
     lines = [
         "STUDENT PERFORMANCE REPORT",
@@ -57,17 +71,40 @@ def generate_report(df, output_file="student_performance_report.txt"):
         "-" * 40,
         f"Student ID: {int(lowest['Student_ID'])}",
         f"Final marks: {lowest['Final_Marks']}",
+        "",
+        "STUDENT IMPROVEMENT SUMMARY",
+        "-" * 40,
+        f"Students improved: {improved_students}",
+        f"Students unchanged: {unchanged_students}",
+        f"Students declined: {declined_students}",
+        f"Average improvement: {average_improvement:.2f} marks",
+        f"Most improved student ID: "
+        f"{int(most_improved_student['Student_ID'])}",
+        f"Highest improvement: {highest_improvement:.2f} marks",
     ]
 
     if "Performance_Category" in df.columns:
-        lines.extend(["", "PERFORMANCE CATEGORIES", "-" * 40])
+        lines.extend([
+            "",
+            "PERFORMANCE CATEGORIES",
+            "-" * 40
+        ])
 
-        category_counts = df["Performance_Category"].value_counts()
+        category_counts = (
+            df["Performance_Category"].value_counts()
+        )
+
         for category, count in category_counts.items():
-            lines.append(f"{category}: {count} student(s)")
+            lines.append(
+                f"{category}: {count} student(s)"
+            )
 
     if "Grade" in df.columns:
-        lines.extend(["", "GRADE-WISE SUMMARY", "-" * 40])
+        lines.extend([
+            "",
+            "GRADE-WISE SUMMARY",
+            "-" * 40
+        ])
 
         grade_counts = (
             df["Grade"]
@@ -77,11 +114,18 @@ def generate_report(df, output_file="student_performance_report.txt"):
 
         for grade, count in grade_counts.items():
             percentage = count / len(df) * 100
+
             lines.append(
-                f"Grade {grade}: {count} student(s) ({percentage:.2f}%)"
+                f"Grade {grade}: "
+                f"{count} student(s) "
+                f"({percentage:.2f}%)"
             )
 
-    with open(output_file, "w", encoding="utf-8") as file:
+    with open(
+        output_file,
+        "w",
+        encoding="utf-8"
+    ) as file:
         file.write("\n".join(lines))
 
     return output_file
