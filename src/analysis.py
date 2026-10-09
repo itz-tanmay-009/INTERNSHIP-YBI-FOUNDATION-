@@ -1,3 +1,4 @@
+
 """Functions for analyzing student academic performance."""
 
 from validation import MINIMUM_PASSING_MARKS
@@ -21,6 +22,9 @@ def calculate_averages(df):
 
 def find_top_and_lowest_students(df):
     """Find the students with the highest and lowest final marks."""
+
+    if df.empty:
+        return None, None
 
     marks = df["Final_Marks"]
 
@@ -57,6 +61,9 @@ def add_performance_category(df):
 
 def calculate_category_statistics(df):
     """Calculate counts and percentages for each performance category."""
+
+    if df.empty:
+        return {}, {}
 
     category_counts = df["Performance_Category"].value_counts()
     category_percentages = category_counts.div(len(df)).mul(100)
@@ -100,6 +107,14 @@ def find_students_needing_improvement(df):
 def calculate_performance_statistics(df):
     """Calculate additional statistical measures for final marks."""
 
+    if df.empty:
+        return {
+            "median_final": 0.0,
+            "std_final": 0.0,
+            "minimum_final": 0.0,
+            "maximum_final": 0.0
+        }
+
     final_marks = df["Final_Marks"]
 
     return {
@@ -111,14 +126,14 @@ def calculate_performance_statistics(df):
 
 
 def calculate_average_improvement(df):
-    """Calculate the average improvement from previous to final marks."""
+    """Calculate average change from previous to final marks."""
 
     if df.empty:
         return 0.0
 
     improvement = df["Final_Marks"] - df["Previous_Marks"]
 
-    return improvement.mean()
+    return round(improvement.mean(), 2)
 
 
 def calculate_pass_percentage(df):
