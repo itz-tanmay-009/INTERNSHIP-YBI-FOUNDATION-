@@ -1,131 +1,104 @@
-"""Generate a text report for student performance analysis."""
+from pathlib import Path
 
-from validation import MINIMUM_PASSING_MARKS
+from analysis import (
+    calculate_averages,
+    calculate_average_improvement,
+    calculate_pass_percentage,
+    find_top_three_students,
+    generate_insights,
+    get_correlation_matrix,
+    get_grade_counts,
+    get_lowest_student,
+    get_top_student,
+)
 
 
-GRADE_ORDER = ["A", "B", "C", "D", "F"]
-
-
-def generate_report(df, output_file="student_performance_report.txt"):
-    """Create and save a summary report from the student dataset."""
-
-    if df.empty:
-        raise ValueError("Cannot generate a report from an empty dataset.")
-
-    required_columns = {
-        "Student_ID",
-        "Study_Hours",
-        "Attendance",
-        "Assignment_Score",
-        "Previous_Marks",
-        "Final_Marks",
-    }
-
-    missing_columns = required_columns - set(df.columns)
-
-    if missing_columns:
-        raise ValueError(
-            f"Missing required columns: {sorted(missing_columns)}"
-        )
-
-    highest = df.loc[df["Final_Marks"].idxmax()]
-    lowest = df.loc[df["Final_Marks"].idxmin()]
-
-    passed = df["Final_Marks"].ge(MINIMUM_PASSING_MARKS).sum()
-    failed = len(df) - passed
-    pass_percentage = (passed / len(df)) * 100
-
-    # Calculate improvement from previous marks to final marks
-    improvement = df["Final_Marks"] - df["Previous_Marks"]
-
-    improved_students = (improvement > 0).sum()
-    unchanged_students = (improvement == 0).sum()
-    declined_students = (improvement < 0).sum()
-    average_improvement = improvement.mean()
-
-    most_improved_index = improvement.idxmax()
-    most_improved_student = df.loc[most_improved_index]
-    highest_improvement = improvement.loc[most_improved_index]
+def generate_report(df):
+    averages = calculate_averages(df)
+    top = get_top_student(df)
+    lowest = get_lowest_student(df)
+    top_three = find_top_three_students(df)
+    grade_counts = get_grade_counts(df)
+    correlations = get_correlation_matrix(df)
 
     lines = [
-        "STUDENT PERFORMANCE REPORT",
-        "=" * 40,
+        "=" * 60,
+        "STUDENT PERFORMANCE ANALYSIS REPORT",
+        "=" * 60,
+        "",
+        "DATASET OVERVIEW",
+        "-" * 60,
         f"Total students: {len(df)}",
-        f"Average study hours: {df['Study_Hours'].mean():.2f}",
-        f"Average attendance: {df['Attendance'].mean():.2f}%",
-        f"Average assignment score: {df['Assignment_Score'].mean():.2f}",
-        f"Average final marks: {df['Final_Marks'].mean():.2f}",
+        f"Average study hours: {averages['Study_Hours']:.2f}",
+        f"Average attendance: {averages['Attendance']:.2f}%",
+        f"Average previous marks: {averages['Previous_Marks']:.2f}",
+        f"Average assignment marks: {averages['Assignment_Marks']:.2f}",
+        f"Average final marks: {averages['Final_Marks']:.2f}",
         "",
-        "PASS / FAIL SUMMARY",
-        "-" * 40,
-        f"Passed students: {passed}",
-        f"Failed students: {failed}",
-        f"Pass percentage: {pass_percentage:.2f}%",
+        "PASSING AND IMPROVEMENT",
+        "-" * 60,
+        f"Pass percentage: {calculate_pass_percentage(df):.2f}%",
+        (
+            "Average mark change: "
+            f"{calculate_average_improvement(df):.2f}"
+        ),
         "",
-        "TOP PERFORMANCE",
-        "-" * 40,
-        f"Student ID: {int(highest['Student_ID'])}",
-        f"Final marks: {highest['Final_Marks']}",
+        "HIGHEST SCORER",
+        "-" * 60,
+        f"Student {int(top['Student_ID'])}: {top['Final_Marks']:.0f} marks",
         "",
-        "LOWEST PERFORMANCE",
-        "-" * 40,
-        f"Student ID: {int(lowest['Student_ID'])}",
-        f"Final marks: {lowest['Final_Marks']}",
+        "LOWEST SCORER",
+        "-" * 60,
+        (
+            f"Student {int(lowest['Student_ID'])}: "
+            f"{lowest['Final_Marks']:.0f} marks"
+        ),
         "",
-        "STUDENT IMPROVEMENT SUMMARY",
-        "-" * 40,
-        f"Students improved: {improved_students}",
-        f"Students unchanged: {unchanged_students}",
-        f"Students declined: {declined_students}",
-        f"Average improvement: {average_improvement:.2f} marks",
-        f"Most improved student ID: "
-        f"{int(most_improved_student['Student_ID'])}",
-        f"Highest improvement: {highest_improvement:.2f} marks",
+        "TOP THREE STUDENTS",
+        "-" * 60,
     ]
 
-    if "Performance_Category" in df.columns:
-        lines.extend([
-            "",
-            "PERFORMANCE CATEGORIES",
-            "-" * 40
-        ])
-
-        category_counts = (
-            df["Performance_Category"].value_counts()
+    for rank, (_, student) in enumerate(top_three.iterrows(), start=1):
+        lines.append(
+            f"{rank}. Student {int(student['Student_ID'])}: "
+            f"{student['Final_Marks']:.0f} marks"
         )
 
-        for category, count in category_counts.items():
+    lines.extend(["", "PERFORMANCE CATEGORY COUNTS", "-" * 60])
+
+    for category, count in grade_counts.items():
+        lines.append(f"{category}: {count}")
+
+    lines.extend(["", "CORRELATION WITH FINAL MARKS", "-" * 60])
+
+    for column in correlations.columns:
+        if column != "Final_Marks":
             lines.append(
-                f"{category}: {count} student(s)"
+                f"{column}: {correlations.loc[column, 'Final_Marks']:.2f}"
             )
 
-    if "Grade" in df.columns:
-        lines.extend([
-            "",
-            "GRADE-WISE SUMMARY",
-            "-" * 40
-        ])
+    lines.extend(["", "AUTOMATED INSIGHTS", "-" * 60])
+    lines.extend(f"- {item}" for item in generate_insights(df))
 
-        grade_counts = (
-            df["Grade"]
-            .value_counts()
-            .reindex(GRADE_ORDER, fill_value=0)
-        )
+    lines.extend([
+        "",
+        "INTERPRETATION NOTE",
+        "-" * 60,
+        "Correlation indicates association, not causation.",
+        "Results depend on dataset quality and sample size.",
+        "Synthetic data should not be treated as real-world evidence.",
+        "",
+        "=" * 60,
+    ])
 
-        for grade, count in grade_counts.items():
-            percentage = count / len(df) * 100
+    return "\n".join(lines)
 
-            lines.append(
-                f"Grade {grade}: "
-                f"{count} student(s) "
-                f"({percentage:.2f}%)"
-            )
 
-    with open(
-        output_file,
-        "w",
-        encoding="utf-8"
-    ) as file:
-        file.write("\n".join(lines))
-
-    return output_file
+def save_report(
+    report_text,
+    output_file="output/student_performance_report.txt",
+):
+    path = Path(output_file)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(report_text, encoding="utf-8")
+    return path
