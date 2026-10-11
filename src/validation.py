@@ -1,143 +1,69 @@
-"""Project settings and dataset validation functions."""
-
 import numpy as np
 import pandas as pd
 
-
-# Project information
-PROJECT_NAME = "Student Performance Analysis"
-
-# Performance thresholds
-EXCELLENT_MARKS = 85
-GOOD_MARKS = 70
-MINIMUM_PASSING_MARKS = 40
-
-# Valid data ranges
-MIN_MARKS = 0
-MAX_MARKS = 100
-
-MIN_ATTENDANCE = 0
-MAX_ATTENDANCE = 100
-
-MIN_STUDY_HOURS = 0
-
-# Supported performance categories
-SUPPORTED_CATEGORIES = [
-    "Excellent",
-    "Good",
-    "Needs Improvement",
-]
-
-# Required numeric columns
-NUMERIC_COLUMNS = [
+REQUIRED_COLUMNS = [
     "Student_ID",
     "Study_Hours",
     "Attendance",
-    "Assignment_Score",
     "Previous_Marks",
+    "Assignment_Marks",
+    "Final_Marks",
+]
+
+MARK_COLUMNS = [
+    "Attendance",
+    "Previous_Marks",
+    "Assignment_Marks",
     "Final_Marks",
 ]
 
 
-def validate_dataset(df):
-    """Validate the structure and values of the student dataset."""
-
-    required_columns = set(NUMERIC_COLUMNS)
-    missing_columns = required_columns - set(df.columns)
-
-    if missing_columns:
-        raise ValueError(
-            f"Missing required columns: {sorted(missing_columns)}"
-        )
+def validate_data(df):
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("Input must be a pandas DataFrame.")
 
     if df.empty:
         raise ValueError("The dataset is empty.")
 
-    # Check for missing values
-    missing_values = df[NUMERIC_COLUMNS].isnull().sum()
-    columns_with_missing_values = missing_values[
-        missing_values > 0
-    ]
+    missing = set(REQUIRED_COLUMNS) - set(df.columns)
+    if missing:
+        raise ValueError(f"Missing columns: {sorted(missing)}")
 
-    if not columns_with_missing_values.empty:
-        raise ValueError(
-            "Missing values found: "
-            f"{columns_with_missing_values.to_dict()}"
-        )
+    data = df[REQUIRED_COLUMNS].copy()
 
-    # Check that required columns contain numeric data
-    for column in NUMERIC_COLUMNS:
-        if not pd.api.types.is_numeric_dtype(df[column]):
-            raise ValueError(
-                f"{column} must contain numeric values."
-            )
+    if data.isnull().any().any():
+        raise ValueError("The dataset contains missing values.")
 
-        if not np.isfinite(df[column]).all():
-            raise ValueError(
-                f"{column} must contain only finite values."
-            )
+    for column in REQUIRED_COLUMNS:
+        data[column] = pd.to_numeric(data[column], errors="raise")
 
-    # Check for duplicate student IDs
-    if df["Student_ID"].duplicated().any():
-        raise ValueError("Duplicate student IDs found.")
+    if not np.isfinite(data.to_numpy(dtype=float)).all():
+        raise ValueError("The dataset contains invalid numeric values.")
 
-    # Validate marks
-    marks_columns = [
-        "Assignment_Score",
-        "Previous_Marks",
-        "Final_Marks",
-    ]
+    if data["Student_ID"].duplicated().any():
+        raise ValueError("Student IDs must be unique.")
 
-    for column in marks_columns:
-        if not df[column].between(MIN_MARKS, MAX_MARKS).all():
-            raise ValueError(
-                f"{column} must contain values between "
-                f"{MIN_MARKS} and {MAX_MARKS}."
-            )
+    if (data["Student_ID"] <= 0).any():
+        raise ValueError("Student IDs must be positive.")
 
-    # Validate attendance
-    if not df["Attendance"].between(
-        MIN_ATTENDANCE,
-        MAX_ATTENDANCE,
-    ).all():
-        raise ValueError(
-            "Attendance must be between 0 and 100."
-        )
-
-    # Validate study hours
-    if (df["Study_Hours"] < MIN_STUDY_HOURS).any():
+    if (data["Study_Hours"] < 0).any():
         raise ValueError("Study hours cannot be negative.")
+
+    for column in MARK_COLUMNS:
+        if not data[column].between(0, 100).all():
+            raise ValueError(f"{column} must be between 0 and 100.")
 
     return True
 
 
-def generate_data_quality_summary(df):
-    """Return a summary of dataset quality checks."""
-
-    if df.empty:
-        raise ValueError(
-            "Cannot summarize an empty dataset."
-        )
-
-    if "Student_ID" not in df.columns:
-        raise ValueError(
-            "The dataset must contain Student_ID."
-        )
-
-    missing_values = int(df.isnull().sum().sum())
-    duplicate_ids = int(df["Student_ID"].duplicated().sum())
-
-    summary = {
-        "total_rows": len(df),
-        "total_columns": len(df.columns),
-        "missing_values": missing_values,
-        "duplicate_student_ids": duplicate_ids,
+def get_data_quality_summary(df):
+    return {
+        "rows": len(df),
+        "columns": len(df.columns),
+        "missing_values": int(df.isnull().sum().sum()),
+        "duplicate_student_ids": (
+            int(df["Student_ID"].duplicated().sum())
+            if "Student_ID" in df.columns
+            else None
+        ),
     }
-
-    summary["data_quality_status"] = (
-        "Passed"
-        if missing_values == 0 and duplicate_ids == 0
-        else "Needs Review"
-    )
-
-    return summary
