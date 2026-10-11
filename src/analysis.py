@@ -1,4 +1,4 @@
-```python
+
 """Functions for analyzing student academic performance."""
 
 from validation import MINIMUM_PASSING_MARKS
@@ -189,4 +189,3 @@ def calculate_pass_fail_count(df):
     failed_count = len(df) - passed_count
 
     return passed_count, failed_count
-```
