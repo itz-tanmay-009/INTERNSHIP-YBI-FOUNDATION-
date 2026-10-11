@@ -1,191 +1,99 @@
+import pandas as pd
 
-"""Functions for analyzing student academic performance."""
-
-from validation import MINIMUM_PASSING_MARKS
+PASS_MARK = 40
 
 
 def calculate_averages(df):
-    """Calculate average values for key student performance metrics."""
-
-    columns = {
-        "average_final": "Final_Marks",
-        "average_study": "Study_Hours",
-        "average_attendance": "Attendance",
-        "average_assignment": "Assignment_Score",
-    }
-
-    return {
-        result_name: df[column_name].mean()
-        for result_name, column_name in columns.items()
-    }
-
-
-def find_top_and_lowest_students(df):
-    """Find the students with the highest and lowest final marks."""
-
-    if df.empty:
-        return None, None
-
-    marks = df["Final_Marks"]
-
-    highest_student = df.loc[marks.idxmax()]
-    lowest_student = df.loc[marks.idxmin()]
-
-    return highest_student, lowest_student
-
-
-def find_top_students(df, count=3):
-    """Return the top students ranked by final marks."""
-
-    if count <= 0:
-        raise ValueError("Count must be greater than zero.")
-
-    if df.empty:
-        return df.copy()
-
-    required_columns = {"Student_ID", "Final_Marks"}
-    missing_columns = required_columns - set(df.columns)
-
-    if missing_columns:
-        raise ValueError(
-            f"Missing required columns: {sorted(missing_columns)}"
-        )
-
-    return (
-        df.sort_values(
-            by=["Final_Marks", "Student_ID"],
-            ascending=[False, True],
-        )
-        .head(count)
-        .reset_index(drop=True)
-    )
-
-
-def performance_category(marks):
-    """Classify a student's performance based on final marks."""
-
-    categories = [
-        (85, "Excellent"),
-        (70, "Good"),
-    ]
-
-    for minimum_marks, category in categories:
-        if marks >= minimum_marks:
-            return category
-
-    return "Needs Improvement"
-
-
-def add_performance_category(df):
-    """Add a performance category column to the DataFrame."""
-
-    df["Performance_Category"] = df["Final_Marks"].map(
-        performance_category
-    )
-
-    return df
-
-
-def calculate_category_statistics(df):
-    """Calculate counts and percentages for each performance category."""
-
-    if df.empty:
-        return {}, {}
-
-    category_counts = df["Performance_Category"].value_counts()
-    category_percentages = category_counts.div(len(df)).mul(100)
-
-    return category_counts, category_percentages
-
-
-def calculate_correlation(df):
-    """Calculate correlations between academic factors and final marks."""
-
-    academic_columns = [
+    columns = [
         "Study_Hours",
         "Attendance",
-        "Assignment_Score",
         "Previous_Marks",
+        "Assignment_Marks",
         "Final_Marks",
     ]
-
-    correlation_matrix = df[academic_columns].corr()
-
-    return correlation_matrix["Final_Marks"]
+    return df[columns].mean().round(2).to_dict()
 
 
-def determine_class_performance(average_final):
-    """Determine overall class performance from average final marks."""
-
-    return performance_category(average_final)
+def get_top_student(df):
+    return df.loc[df["Final_Marks"].idxmax()].to_dict()
 
 
-def find_students_needing_improvement(df):
-    """Return students whose final marks are below 70."""
-
-    needs_improvement = df["Final_Marks"] < 70
-
-    return df.loc[
-        needs_improvement,
-        ["Student_ID", "Final_Marks"],
-    ]
+def get_lowest_student(df):
+    return df.loc[df["Final_Marks"].idxmin()].to_dict()
 
 
-def calculate_performance_statistics(df):
-    """Calculate additional statistical measures for final marks."""
+def find_top_three_students(df):
+    return df.nlargest(3, "Final_Marks").reset_index(drop=True)
 
+
+def calculate_pass_percentage(df, pass_mark=PASS_MARK):
     if df.empty:
-        return {
-            "median_final": 0.0,
-            "std_final": 0.0,
-            "minimum_final": 0.0,
-            "maximum_final": 0.0,
-        }
-
-    final_marks = df["Final_Marks"]
-
-    return {
-        "median_final": final_marks.median(),
-        "std_final": final_marks.std(),
-        "minimum_final": final_marks.min(),
-        "maximum_final": final_marks.max(),
-    }
+        return 0.0
+    passed = (df["Final_Marks"] >= pass_mark).sum()
+    return round(float(passed / len(df) * 100), 2)
 
 
 def calculate_average_improvement(df):
-    """Calculate average change from previous to final marks."""
-
-    if df.empty:
-        return 0.0
-
-    improvement = df["Final_Marks"] - df["Previous_Marks"]
-
-    return round(improvement.mean(), 2)
+    difference = df["Final_Marks"] - df["Previous_Marks"]
+    return round(float(difference.mean()), 2)
 
 
-def calculate_pass_percentage(df):
-    """Calculate the percentage of students who meet the passing mark."""
+def get_performance_categories(df):
+    result = df.copy()
+    result["Performance_Category"] = pd.cut(
+        result["Final_Marks"],
+        bins=[-1, 39, 59, 79, 100],
+        labels=[
+            "Needs Improvement",
+            "Satisfactory",
+            "Good",
+            "Excellent",
+        ],
+    )
+    return result
 
-    if df.empty:
-        return 0.0
 
-    passed_count = df["Final_Marks"].ge(
-        MINIMUM_PASSING_MARKS
-    ).sum()
-
-    return passed_count / len(df) * 100
+def get_grade_counts(df):
+    categorized = get_performance_categories(df)
+    return categorized["Performance_Category"].value_counts(
+        sort=False
+    ).to_dict()
 
 
-def calculate_pass_fail_count(df):
-    """Return the number of students who passed and failed."""
+def get_correlation_matrix(df):
+    columns = [
+        "Study_Hours",
+        "Attendance",
+        "Previous_Marks",
+        "Assignment_Marks",
+        "Final_Marks",
+    ]
+    return df[columns].corr().round(2)
 
-    if df.empty:
-        return 0, 0
 
-    passed_count = df["Final_Marks"].ge(
-        MINIMUM_PASSING_MARKS
-    ).sum()
+def get_descriptive_statistics(df):
+    columns = [
+        "Study_Hours",
+        "Attendance",
+        "Previous_Marks",
+        "Assignment_Marks",
+        "Final_Marks",
+    ]
+    return df[columns].describe().round(2)
 
-    failed_count = len(df) - passed_count
 
-    return passed_count, failed_count
+def generate_insights(df):
+    averages = calculate_averages(df)
+    top = get_top_student(df)
+
+    return [
+        f"Average final marks: {averages['Final_Marks']:.2f}",
+        f"Average study hours: {averages['Study_Hours']:.2f}",
+        f"Average attendance: {averages['Attendance']:.2f}%",
+        f"Pass percentage: {calculate_pass_percentage(df):.2f}%",
+        f"Average mark improvement: {calculate_average_improvement(df):.2f}",
+        (
+            f"Highest scorer: Student {int(top['Student_ID'])} "
+            f"with {top['Final_Marks']:.0f} marks"
+        ),
+    ]
