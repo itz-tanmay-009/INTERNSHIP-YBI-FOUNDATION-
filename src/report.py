@@ -1,3 +1,4 @@
+
 from pathlib import Path
 
 from analysis import (
@@ -15,6 +16,9 @@ from analysis import (
 
 def generate_report(df):
     """Generate a detailed student performance report."""
+    if df.empty:
+        raise ValueError("Cannot generate a report from an empty dataset.")
+
     averages = calculate_averages(df)
     top_student = get_top_student(df)
     lowest_student = get_lowest_student(df)
@@ -45,10 +49,7 @@ def generate_report(df):
         f"Students improved: {improvement['improved_students']}",
         f"Students declined: {improvement['declined_students']}",
         f"Students unchanged: {improvement['unchanged_students']}",
-        (
-            "Average mark change: "
-            f"{calculate_average_improvement(df):.2f}"
-        ),
+        f"Average mark change: {calculate_average_improvement(df):.2f}",
         "",
         "4. STUDENT RANKING",
         "-" * 60,
@@ -85,16 +86,19 @@ def generate_report(df):
         "-" * 60,
     ])
 
-    lines.extend(f"- {insight}" for insight in generate_insights(df))
+    for insight in generate_insights(df):
+        lines.append(f"- {insight}")
 
     lines.extend([
         "",
-        "NOTE",
+        "8. INTERPRETATION NOTES",
         "-" * 60,
         "Correlation does not prove cause and effect.",
-        "The quality of the conclusions depends on the dataset.",
+        "Results depend on the quality and size of the dataset.",
         "Synthetic data may not represent real student performance.",
         "",
+        "=" * 60,
+        "END OF REPORT",
         "=" * 60,
     ])
 
@@ -105,8 +109,19 @@ def save_report(
     report_text,
     output_file="output/student_performance_report.txt",
 ):
-    """Save the report to a text file."""
+    """Save the report as a UTF-8 text file."""
     path = Path(output_file)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(report_text, encoding="utf-8")
     return path
+
+
+def generate_and_save_report(
+    df,
+    output_file="output/student_performance_report.txt",
+):
+    """Generate the report, save it, and return its file path."""
+    report_text = generate_report(df)
+    report_path = save_report(report_text, output_file)
+
+    return report_path
