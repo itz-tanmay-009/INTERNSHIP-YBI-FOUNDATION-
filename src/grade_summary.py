@@ -1,5 +1,5 @@
+
 from pathlib import Path
-import pandas as pd
 
 from analysis import (
     get_performance_categories,
@@ -11,8 +11,6 @@ def create_grade_summary(df):
     """Create student-level and category-level summaries."""
     categorized = get_performance_categories(df)
 
-    comparison = compare_previous_and_final_marks(df)
-
     summary = categorized[
         [
             "Student_ID",
@@ -23,6 +21,8 @@ def create_grade_summary(df):
         ]
     ].copy()
 
+    comparison = compare_previous_and_final_marks(df)
+
     summary = summary.merge(
         comparison[
             ["Student_ID", "Mark_Change", "Improvement_Status"]
@@ -32,34 +32,32 @@ def create_grade_summary(df):
         validate="one_to_one",
     )
 
+    category_groups = summary.groupby(
+        "Performance_Category",
+        observed=False,
+    )
+
     grade_counts = (
-        summary.groupby(
-            "Performance_Category",
-            observed=False,
-        )
-        .size()
+        category_groups.size()
         .rename("Student_Count")
         .reset_index()
     )
 
-    grade_average_marks = (
-        summary.groupby(
-            "Performance_Category",
-            observed=False,
-        )["Final_Marks"]
+    grade_averages = (
+        category_groups["Final_Marks"]
         .mean()
         .round(2)
         .rename("Average_Final_Marks")
         .reset_index()
     )
 
-    return summary, grade_counts, grade_average_marks
+    return summary, grade_counts, grade_averages
 
 
 def save_grade_summary(
     summary,
     average_marks=None,
-    output_file="grade_summary.csv",
+    output_file="output/grade_summary.csv",
 ):
     """Save a summary DataFrame as a CSV file."""
     if isinstance(average_marks, (str, Path)):
@@ -73,25 +71,20 @@ def save_grade_summary(
 
 
 def save_all_grade_summaries(df, output_dir="output"):
-    """Save all grade-summary CSV files."""
+    """Save student, category-count, and category-average CSV files."""
     directory = Path(output_dir)
     directory.mkdir(parents=True, exist_ok=True)
 
     summary, counts, averages = create_grade_summary(df)
 
-    save_grade_summary(
-        summary,
-        output_file=directory / "grade_summary.csv",
-    )
-
-    counts.to_csv(directory / "grade_counts.csv", index=False)
-    averages.to_csv(
-        directory / "grade_average_marks.csv",
-        index=False,
-    )
-
-    return {
+    paths = {
         "summary": directory / "grade_summary.csv",
         "counts": directory / "grade_counts.csv",
         "averages": directory / "grade_average_marks.csv",
     }
+
+    summary.to_csv(paths["summary"], index=False)
+    counts.to_csv(paths["counts"], index=False)
+    averages.to_csv(paths["averages"], index=False)
+
+    return paths
