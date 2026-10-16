@@ -3,14 +3,6 @@ import pandas as pd
 
 PASS_MARK = 40
 
-PERFORMANCE_BINS = [-1, 39, 59, 79, 100]
-PERFORMANCE_LABELS = [
-    "Needs Improvement",
-    "Satisfactory",
-    "Good",
-    "Excellent",
-]
-
 NUMERIC_COLUMNS = [
     "Study_Hours",
     "Attendance",
@@ -19,34 +11,39 @@ NUMERIC_COLUMNS = [
     "Final_Marks",
 ]
 
+PERFORMANCE_BINS = [-0.001, 39, 59, 79, 100]
+PERFORMANCE_LABELS = [
+    "Needs Improvement",
+    "Satisfactory",
+    "Good",
+    "Excellent",
+]
+
 
 def calculate_averages(df):
-    """Calculate average values for student performance."""
+    """Calculate average values for numerical columns."""
     return df[NUMERIC_COLUMNS].mean().round(2).to_dict()
 
 
 def get_top_student(df):
-    """Return the student with the highest final marks."""
+    """Find the student with the highest final marks."""
     if df.empty:
-        raise ValueError("Cannot find a top student in an empty dataset.")
+        raise ValueError("No student records are available.")
 
     return df.loc[df["Final_Marks"].idxmax()].to_dict()
 
 
 def get_lowest_student(df):
-    """Return the student with the lowest final marks."""
+    """Find the student with the lowest final marks."""
     if df.empty:
-        raise ValueError("Cannot find a lowest-scoring student in an empty dataset.")
+        raise ValueError("No student records are available.")
 
     return df.loc[df["Final_Marks"].idxmin()].to_dict()
 
 
 def find_top_three_students(df):
-    """Return the three students with the highest final marks."""
-    return (
-        df.nlargest(3, "Final_Marks")
-        .reset_index(drop=True)
-    )
+    """Return the top three students by final marks."""
+    return df.nlargest(3, "Final_Marks").reset_index(drop=True)
 
 
 def calculate_pass_percentage(df, pass_mark=PASS_MARK):
@@ -61,18 +58,55 @@ def calculate_pass_percentage(df, pass_mark=PASS_MARK):
     return round(float(passed / len(df) * 100), 2)
 
 
-def calculate_average_improvement(df):
-    """Calculate the average change in student marks."""
-    change = df["Final_Marks"] - df["Previous_Marks"]
+def compare_previous_and_final_marks(df):
+    """Compare previous and final marks for each student."""
+    result = df[
+        ["Student_ID", "Previous_Marks", "Final_Marks"]
+    ].copy()
 
-    if change.empty:
+    result["Mark_Change"] = (
+        result["Final_Marks"] - result["Previous_Marks"]
+    )
+
+    result["Improvement_Status"] = result["Mark_Change"].map(
+        lambda change: (
+            "Improved" if change > 0
+            else "Declined" if change < 0
+            else "Unchanged"
+        )
+    )
+
+    return result
+
+
+def calculate_average_improvement(df):
+    """Calculate the average change in marks."""
+    comparison = compare_previous_and_final_marks(df)
+
+    if comparison.empty:
         return 0.0
 
-    return round(float(change.mean()), 2)
+    return round(float(comparison["Mark_Change"].mean()), 2)
+
+
+def get_improvement_summary(df):
+    """Count students whose marks improved, declined, or stayed equal."""
+    comparison = compare_previous_and_final_marks(df)
+    changes = comparison["Mark_Change"]
+
+    return {
+        "improved_students": int((changes > 0).sum()),
+        "declined_students": int((changes < 0).sum()),
+        "unchanged_students": int((changes == 0).sum()),
+        "average_mark_change": (
+            round(float(changes.mean()), 2)
+            if not changes.empty else 0.0
+        ),
+    }
 
 
 def get_performance_categories(df):
-    """Assign a performance category to every student."""
+    """Assign a performance category based on final marks."""
     result = df.copy()
 
     result["Performance_Category"] = pd.cut(
@@ -94,68 +128,39 @@ def get_grade_counts(df):
 
 
 def get_correlation_matrix(df):
-    """Calculate correlations between numerical performance measures."""
+    """Calculate correlations between performance measures."""
     return df[NUMERIC_COLUMNS].corr().round(2)
 
 
 def get_descriptive_statistics(df):
-    """Return descriptive statistics for numerical columns."""
+    """Calculate descriptive statistics for numerical columns."""
     return df[NUMERIC_COLUMNS].describe().round(2)
 
 
-def compare_previous_and_final_marks(df):
-    """Compare previous marks with final marks for each student."""
-    result = df[
-        ["Student_ID", "Previous_Marks", "Final_Marks"]
-    ].copy()
+def get_attendance_summary(df):
+    """Summarize student attendance."""
+    attendance = df["Attendance"]
 
-    result["Mark_Change"] = (
-        result["Final_Marks"] - result["Previous_Marks"]
-    )
-
-    result["Improvement_Status"] = result["Mark_Change"].apply(
-        lambda value: (
-            "Improved" if value > 0
-            else "Declined" if value < 0
-            else "Unchanged"
-        )
-    )
-
-    return result
-
-
-def get_improvement_summary(df):
-    """Summarize student improvement and decline."""
-    comparison = compare_previous_and_final_marks(df)
-    changes = comparison["Mark_Change"]
+    if attendance.empty:
+        return {
+            "average_attendance": 0.0,
+            "low_attendance_students": 0,
+        }
 
     return {
-        "improved_students": int((changes > 0).sum()),
-        "declined_students": int((changes < 0).sum()),
-        "unchanged_students": int((changes == 0).sum()),
-        "average_mark_change": (
-            round(float(changes.mean()), 2)
-            if not changes.empty else 0.0
-        ),
+        "average_attendance": round(float(attendance.mean()), 2),
+        "low_attendance_students": int((attendance < 75).sum()),
     }
 
 
 def find_students_needing_support(df, pass_mark=PASS_MARK):
-    """Find students scoring below the pass mark."""
-    required_columns = {"Student_ID", "Final_Marks"}
-    missing_columns = required_columns - set(df.columns)
-
-    if missing_columns:
-        raise ValueError(
-            f"Missing required columns: {sorted(missing_columns)}"
-        )
-
+    """Find students whose final marks are below the pass mark."""
     if not 0 <= pass_mark <= 100:
         raise ValueError("Pass mark must be between 0 and 100.")
 
     students = df[df["Final_Marks"] < pass_mark].copy()
 
-    students["Support_Reason"] = students["Final_Marks"].apply(
+    students["Support_Reason"] = students["Final_Marks"].map(
         lambda marks: (
             "Needs immediate support"
             if marks < pass_mark / 2
@@ -166,28 +171,8 @@ def find_students_needing_support(df, pass_mark=PASS_MARK):
     return students.reset_index(drop=True)
 
 
-def get_attendance_summary(df):
-    """Summarize attendance across students."""
-    attendance = df["Attendance"]
-
-    if attendance.empty:
-        return {
-            "average_attendance": 0.0,
-            "highest_attendance": 0.0,
-            "lowest_attendance": 0.0,
-            "low_attendance_students": 0,
-        }
-
-    return {
-        "average_attendance": round(float(attendance.mean()), 2),
-        "highest_attendance": round(float(attendance.max()), 2),
-        "lowest_attendance": round(float(attendance.min()), 2),
-        "low_attendance_students": int((attendance < 75).sum()),
-    }
-
-
 def generate_insights(df):
-    """Generate simple insights from the student dataset."""
+    """Generate readable findings from the dataset."""
     if df.empty:
         return ["No student records are available for analysis."]
 
@@ -197,7 +182,7 @@ def generate_insights(df):
     attendance = get_attendance_summary(df)
 
     return [
-        f"Students analyzed: {len(df)}",
+        f"Total students analyzed: {len(df)}",
         f"Average final marks: {averages['Final_Marks']:.2f}",
         f"Average study hours: {averages['Study_Hours']:.2f}",
         f"Average attendance: {averages['Attendance']:.2f}%",
@@ -205,7 +190,10 @@ def generate_insights(df):
         f"Students who improved: {improvement['improved_students']}",
         f"Students who declined: {improvement['declined_students']}",
         f"Average mark change: {improvement['average_mark_change']:.2f}",
-        f"Students with attendance below 75%: {attendance['low_attendance_students']}",
+        (
+            "Students with attendance below 75%: "
+            f"{attendance['low_attendance_students']}"
+        ),
         (
             f"Highest scorer: Student {int(top['Student_ID'])}, "
             f"{top['Final_Marks']:.0f} marks"
