@@ -32,26 +32,19 @@ def create_grade_summary(df):
         validate="one_to_one",
     )
 
-    category_groups = summary.groupby(
-        "Performance_Category",
-        observed=False,
-    )
+    groups = summary.groupby("Performance_Category", observed=False)
 
-    grade_counts = (
-        category_groups.size()
-        .rename("Student_Count")
-        .reset_index()
-    )
+    counts = groups.size().rename("Student_Count").reset_index()
 
-    grade_averages = (
-        category_groups["Final_Marks"]
+    averages = (
+        groups["Final_Marks"]
         .mean()
         .round(2)
         .rename("Average_Final_Marks")
         .reset_index()
     )
 
-    return summary, grade_counts, grade_averages
+    return summary, counts, averages
 
 
 def save_grade_summary(
@@ -71,7 +64,7 @@ def save_grade_summary(
 
 
 def save_all_grade_summaries(df, output_dir="output"):
-    """Save student, category-count, and category-average CSV files."""
+    """Save student summaries and category statistics."""
     directory = Path(output_dir)
     directory.mkdir(parents=True, exist_ok=True)
 

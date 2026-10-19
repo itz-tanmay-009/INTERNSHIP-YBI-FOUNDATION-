@@ -14,14 +14,14 @@ from analysis import (
 
 
 def generate_report(df):
-    """Generate a readable student performance report."""
+    """Generate a detailed student performance report."""
     if df.empty:
         raise ValueError("Cannot generate a report from an empty dataset.")
 
     averages = calculate_averages(df)
     top = get_top_student(df)
     lowest = get_lowest_student(df)
-    grade_counts = get_grade_counts(df)
+    categories = get_grade_counts(df)
     improvement = get_improvement_summary(df)
     correlations = get_correlation_matrix(df)
 
@@ -62,7 +62,7 @@ def generate_report(df):
         "-" * 60,
     ]
 
-    for category, count in grade_counts.items():
+    for category, count in categories.items():
         lines.append(f"{category}: {count} students")
 
     lines.extend([
@@ -82,7 +82,7 @@ def generate_report(df):
         "-" * 60,
     ])
 
-    lines.extend(f"- {item}" for item in generate_insights(df))
+    lines.extend(f"- {insight}" for insight in generate_insights(df))
 
     lines.extend([
         "",
@@ -115,6 +115,6 @@ def generate_and_save_report(
     df,
     output_file="output/student_performance_report.txt",
 ):
-    """Generate and save the report in one step."""
-    report_text = generate_report(df)
-    return save_report(report_text, output_file)
+    """Generate and save a report in one operation."""
+    text = generate_report(df)
+    return save_report(text, output_file)

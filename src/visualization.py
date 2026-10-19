@@ -10,7 +10,7 @@ from analysis import get_performance_categories
 
 
 def save_chart(fig, output_file=None):
-    """Save a chart if a path is provided, then close the figure."""
+    """Save a chart when requested and always close the figure."""
     try:
         if output_file:
             path = Path(output_file)
@@ -21,7 +21,7 @@ def save_chart(fig, output_file=None):
 
 
 def plot_marks_distribution(df, output_file=None):
-    """Plot the distribution of final marks."""
+    """Show the distribution of final marks."""
     fig, ax = plt.subplots(figsize=(8, 5))
 
     ax.hist(df["Final_Marks"], bins=8, edgecolor="black")
@@ -34,7 +34,7 @@ def plot_marks_distribution(df, output_file=None):
 
 
 def plot_study_hours_vs_marks(df, output_file=None):
-    """Plot study hours against final marks."""
+    """Compare study hours and final marks."""
     fig, ax = plt.subplots(figsize=(8, 5))
 
     ax.scatter(df["Study_Hours"], df["Final_Marks"])
@@ -47,7 +47,7 @@ def plot_study_hours_vs_marks(df, output_file=None):
 
 
 def plot_attendance_vs_marks(df, output_file=None):
-    """Plot attendance against final marks."""
+    """Compare attendance and final marks."""
     fig, ax = plt.subplots(figsize=(8, 5))
 
     ax.scatter(df["Attendance"], df["Final_Marks"])
@@ -73,7 +73,7 @@ def plot_previous_vs_final_marks(df, output_file=None):
 
 
 def plot_performance_categories(df, output_file=None):
-    """Plot the number of students in each performance category."""
+    """Show the number of students in each performance category."""
     categorized = get_performance_categories(df)
 
     counts = categorized["Performance_Category"].value_counts(
@@ -92,7 +92,7 @@ def plot_performance_categories(df, output_file=None):
 
 
 def plot_mark_change(df, output_file=None):
-    """Plot the change between previous and final marks."""
+    """Show changes between previous and final marks."""
     fig, ax = plt.subplots(figsize=(10, 5))
 
     changes = df["Final_Marks"] - df["Previous_Marks"]
@@ -102,6 +102,28 @@ def plot_mark_change(df, output_file=None):
     ax.set_title("Change in Student Marks")
     ax.set_xlabel("Student ID")
     ax.set_ylabel("Change in Marks")
+
+    save_chart(fig, output_file)
+
+
+def plot_average_marks(df, output_file=None):
+    """Compare average previous, assignment, and final marks."""
+    columns = [
+        "Previous_Marks",
+        "Assignment_Marks",
+        "Final_Marks",
+    ]
+
+    averages = df[columns].mean()
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    averages.plot(kind="bar", ax=ax, edgecolor="black")
+
+    ax.set_title("Average Marks Comparison")
+    ax.set_xlabel("Assessment")
+    ax.set_ylabel("Average Marks")
+    ax.tick_params(axis="x", rotation=15)
+    ax.grid(axis="y", alpha=0.25)
 
     save_chart(fig, output_file)
 
@@ -118,6 +140,7 @@ def create_all_charts(df, output_dir="output/charts"):
         "previous_vs_final_marks": plot_previous_vs_final_marks,
         "performance_categories": plot_performance_categories,
         "mark_change": plot_mark_change,
+        "average_marks": plot_average_marks,
     }
 
     saved_paths = {}

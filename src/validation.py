@@ -20,12 +20,12 @@ MARK_COLUMNS = [
 
 
 def validate_data(df):
-    """Validate the structure and values of student records."""
+    """Validate student data before performing analysis."""
     if not isinstance(df, pd.DataFrame):
         raise ValueError("Input must be a pandas DataFrame.")
 
     if df.empty:
-        raise ValueError("The dataset is empty.")
+        raise ValueError("The dataset contains no records.")
 
     missing = [
         column for column in REQUIRED_COLUMNS
@@ -33,7 +33,7 @@ def validate_data(df):
     ]
 
     if missing:
-        raise ValueError(f"Missing columns: {missing}")
+        raise ValueError(f"Missing required columns: {missing}")
 
     data = df[REQUIRED_COLUMNS].copy()
 
@@ -72,7 +72,7 @@ def validate_data(df):
 
 
 def get_data_quality_summary(df):
-    """Count common data-quality issues."""
+    """Summarize common data-quality issues."""
     return {
         "total_rows": len(df),
         "total_columns": len(df.columns),
@@ -86,18 +86,18 @@ def get_data_quality_summary(df):
 
 
 def remove_duplicate_rows(df):
-    """Remove completely duplicated rows from a copy."""
+    """Remove fully duplicated records from a copy."""
     return df.drop_duplicates().reset_index(drop=True)
 
 
 def get_missing_value_summary(df):
-    """Return columns that contain missing values."""
+    """Count missing values in each column."""
     missing = df.isnull().sum()
     return missing[missing > 0].to_dict()
 
 
 def check_mark_ranges(df):
-    """Check whether marks and attendance are in valid ranges."""
+    """Check that marks and attendance are between 0 and 100."""
     results = {}
 
     for column in MARK_COLUMNS:
@@ -113,3 +113,17 @@ def check_mark_ranges(df):
         )
 
     return results
+
+
+def get_validation_report(df):
+    """Return a compact validation report."""
+    return {
+        "dataset_is_empty": df.empty,
+        "missing_columns": [
+            column for column in REQUIRED_COLUMNS
+            if column not in df.columns
+        ],
+        "missing_values": int(df.isnull().sum().sum()),
+        "duplicate_rows": int(df.duplicated().sum()),
+        "mark_range_checks": check_mark_ranges(df),
+    }

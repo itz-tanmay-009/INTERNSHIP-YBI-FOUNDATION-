@@ -1,5 +1,6 @@
 
 from pathlib import Path
+
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -7,7 +8,7 @@ DEFAULT_DATA_FILE = PROJECT_ROOT / "data" / "student_performance.csv"
 
 
 def create_sample_data():
-    """Create sample student records for testing."""
+    """Create sample records for testing when no CSV is available."""
     return pd.DataFrame({
         "Student_ID": list(range(1, 21)),
         "Study_Hours": [
@@ -44,7 +45,7 @@ def create_sample_data():
 
 
 def load_data(file_path=None):
-    """Load records from CSV or use sample records for testing."""
+    """Load student data from CSV or use sample records."""
     path = Path(file_path) if file_path else DEFAULT_DATA_FILE
 
     if path.exists():
@@ -53,12 +54,12 @@ def load_data(file_path=None):
     if file_path is not None:
         raise FileNotFoundError(f"Dataset not found: {path}")
 
-    print("CSV dataset not found. Using sample data for testing.")
+    print("CSV not found. Using sample data for testing.")
     return create_sample_data()
 
 
 def get_dataset_overview(df):
-    """Return an overview of the dataset."""
+    """Return basic information about the dataset."""
     return {
         "total_students": len(df),
         "total_columns": len(df.columns),
