@@ -1,6 +1,7 @@
 
 import pandas as pd
 
+
 PASS_MARK = 40
 
 NUMERIC_COLUMNS = [
@@ -40,7 +41,7 @@ def get_lowest_student(df):
 
 
 def find_top_three_students(df):
-    """Return the top three students by final marks."""
+    """Return the three students with the highest final marks."""
     return df.nlargest(3, "Final_Marks").reset_index(drop=True)
 
 
@@ -163,12 +164,17 @@ def find_students_needing_support(df, pass_mark=PASS_MARK):
 def get_student_performance_summary(df):
     """Summarize students by performance level."""
     required_columns = {
-        "Student_ID", "Study_Hours", "Attendance", "Final_Marks"
+        "Student_ID",
+        "Study_Hours",
+        "Attendance",
+        "Final_Marks",
     }
     missing = required_columns - set(df.columns)
 
     if missing:
-        raise ValueError(f"Missing required columns: {sorted(missing)}")
+        raise ValueError(
+            f"Missing required columns: {sorted(missing)}"
+        )
 
     if df.empty:
         return {
@@ -183,7 +189,9 @@ def get_student_performance_summary(df):
     return {
         "total_students": len(df),
         "high_performers": int((marks >= 80).sum()),
-        "average_performers": int(((marks >= 50) & (marks < 80)).sum()),
+        "average_performers": int(
+            ((marks >= 50) & (marks < 80)).sum()
+        ),
         "low_performers": int((marks < 50).sum()),
         "average_final_marks": round(float(marks.mean()), 2),
     }
@@ -192,12 +200,17 @@ def get_student_performance_summary(df):
 def get_student_performance_details(df):
     """Return performance, attendance, and study habit details."""
     required_columns = {
-        "Student_ID", "Study_Hours", "Attendance", "Final_Marks"
+        "Student_ID",
+        "Study_Hours",
+        "Attendance",
+        "Final_Marks",
     }
     missing = required_columns - set(df.columns)
 
     if missing:
-        raise ValueError(f"Missing required columns: {sorted(missing)}")
+        raise ValueError(
+            f"Missing required columns: {sorted(missing)}"
+        )
 
     result = df[
         ["Student_ID", "Study_Hours", "Attendance", "Final_Marks"]
