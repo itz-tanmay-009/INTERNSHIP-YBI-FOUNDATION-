@@ -29,7 +29,6 @@ def get_top_student(df):
     """Find the student with the highest final marks."""
     if df.empty:
         raise ValueError("No student records are available.")
-
     return df.loc[df["Final_Marks"].idxmax()].to_dict()
 
 
@@ -37,7 +36,6 @@ def get_lowest_student(df):
     """Find the student with the lowest final marks."""
     if df.empty:
         raise ValueError("No student records are available.")
-
     return df.loc[df["Final_Marks"].idxmin()].to_dict()
 
 
@@ -50,7 +48,6 @@ def calculate_pass_percentage(df, pass_mark=PASS_MARK):
     """Calculate the percentage of students who passed."""
     if not 0 <= pass_mark <= 100:
         raise ValueError("Pass mark must be between 0 and 100.")
-
     if df.empty:
         return 0.0
 
@@ -75,17 +72,14 @@ def compare_previous_and_final_marks(df):
             else "Unchanged"
         )
     )
-
     return result
 
 
 def calculate_average_improvement(df):
     """Calculate the average change in marks."""
     comparison = compare_previous_and_final_marks(df)
-
     if comparison.empty:
         return 0.0
-
     return round(float(comparison["Mark_Change"].mean()), 2)
 
 
@@ -108,20 +102,17 @@ def get_improvement_summary(df):
 def get_performance_categories(df):
     """Assign a performance category based on final marks."""
     result = df.copy()
-
     result["Performance_Category"] = pd.cut(
         result["Final_Marks"],
         bins=PERFORMANCE_BINS,
         labels=PERFORMANCE_LABELS,
     )
-
     return result
 
 
 def get_grade_counts(df):
     """Count students in each performance category."""
     categorized = get_performance_categories(df)
-
     return categorized["Performance_Category"].value_counts(
         sort=False
     ).to_dict()
@@ -159,7 +150,6 @@ def find_students_needing_support(df, pass_mark=PASS_MARK):
         raise ValueError("Pass mark must be between 0 and 100.")
 
     students = df[df["Final_Marks"] < pass_mark].copy()
-
     students["Support_Reason"] = students["Final_Marks"].map(
         lambda marks: (
             "Needs immediate support"
@@ -167,8 +157,78 @@ def find_students_needing_support(df, pass_mark=PASS_MARK):
             else "Needs extra practice"
         )
     )
-
     return students.reset_index(drop=True)
+
+
+def get_student_performance_summary(df):
+    """Summarize students by performance level."""
+    required_columns = {
+        "Student_ID", "Study_Hours", "Attendance", "Final_Marks"
+    }
+    missing = required_columns - set(df.columns)
+
+    if missing:
+        raise ValueError(f"Missing required columns: {sorted(missing)}")
+
+    if df.empty:
+        return {
+            "total_students": 0,
+            "high_performers": 0,
+            "average_performers": 0,
+            "low_performers": 0,
+            "average_final_marks": 0.0,
+        }
+
+    marks = df["Final_Marks"]
+    return {
+        "total_students": len(df),
+        "high_performers": int((marks >= 80).sum()),
+        "average_performers": int(((marks >= 50) & (marks < 80)).sum()),
+        "low_performers": int((marks < 50).sum()),
+        "average_final_marks": round(float(marks.mean()), 2),
+    }
+
+
+def get_student_performance_details(df):
+    """Return performance, attendance, and study habit details."""
+    required_columns = {
+        "Student_ID", "Study_Hours", "Attendance", "Final_Marks"
+    }
+    missing = required_columns - set(df.columns)
+
+    if missing:
+        raise ValueError(f"Missing required columns: {sorted(missing)}")
+
+    result = df[
+        ["Student_ID", "Study_Hours", "Attendance", "Final_Marks"]
+    ].copy()
+
+    result["Performance_Level"] = result["Final_Marks"].apply(
+        lambda marks: (
+            "High Performer" if marks >= 80
+            else "Average Performer" if marks >= 50
+            else "Low Performer"
+        )
+    )
+
+    result["Attendance_Status"] = result["Attendance"].apply(
+        lambda attendance: (
+            "Low Attendance" if attendance < 75
+            else "Satisfactory Attendance"
+        )
+    )
+
+    result["Study_Habit"] = result["Study_Hours"].apply(
+        lambda hours: (
+            "More Study Recommended" if hours < 2
+            else "Regular Study"
+        )
+    )
+
+    return result.sort_values(
+        by="Final_Marks",
+        ascending=False,
+    ).reset_index(drop=True)
 
 
 def generate_insights(df):
