@@ -7,75 +7,74 @@ import pandas as pd
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DATA_FILE = PROJECT_ROOT / "data" / "student_performance.csv"
 
-COLUMNS = [
-    "Student_ID",
-    "Study_Hours",
-    "Attendance",
-    "Previous_Marks",
-    "Assignment_Marks",
-    "Final_Marks",
-]
-
 
 def create_sample_data():
     """Create a sample dataset containing 20 student records."""
-    records = [
-        [1, 2.0, 65, 55, 60, 58],
-        [2, 3.0, 72, 62, 68, 65],
-        [3, 4.5, 85, 70, 78, 80],
-        [4, 1.5, 60, 45, 50, 48],
-        [5, 5.0, 92, 82, 88, 90],
-        [6, 3.5, 78, 65, 72, 70],
-        [7, 1.0, 55, 42, 45, 47],
-        [8, 6.0, 96, 88, 92, 95],
-        [9, 4.0, 80, 72, 75, 76],
-        [10, 2.5, 68, 58, 62, 60],
-        [11, 5.5, 90, 80, 85, 87],
-        [12, 3.0, 75, 63, 70, 68],
-        [13, 4.0, 82, 74, 79, 78],
-        [14, 2.0, 62, 50, 55, 52],
-        [15, 7.0, 99, 90, 95, 97],
-        [16, 3.5, 77, 68, 73, 72],
-        [17, 4.5, 88, 76, 82, 84],
-        [18, 2.5, 70, 57, 64, 63],
-        [19, 5.0, 91, 83, 89, 91],
-        [20, 3.0, 78, 66, 71, 69],
-    ]
+    data = {
+        "Student_ID": list(range(1, 21)),
+        "Study_Hours": [
+            2, 3, 1, 5, 4, 2, 1, 6, 3, 5,
+            4, 2, 7, 3, 8, 4, 6, 2, 5, 3,
+        ],
+        "Attendance": [
+            70, 80, 60, 90, 85, 75, 55, 95, 78, 88,
+            82, 72, 98, 76, 96, 84, 91, 68, 89, 79,
+        ],
+        "Previous_Marks": [
+            50, 60, 45, 70, 65, 55, 35, 75, 58, 72,
+            68, 48, 80, 57, 85, 63, 77, 42, 74, 59,
+        ],
+        "Assignment_Marks": [
+            55, 65, 50, 75, 70, 60, 40, 80, 62, 78,
+            72, 53, 85, 61, 90, 68, 82, 47, 79, 64,
+        ],
+        "Final_Marks": [
+            60, 70, 55, 80, 75, 65, 47, 85, 68, 82,
+            76, 58, 92, 64, 97, 72, 88, 52, 84, 69,
+        ],
+    }
 
-    return pd.DataFrame(records, columns=COLUMNS)
+    return pd.DataFrame(data)
 
 
 def load_data(file_path=None):
-    """Load student records from CSV or use sample data by default."""
-    if file_path is not None:
-        path = Path(file_path)
+    """Load student data from a CSV file or use the sample dataset."""
+    if file_path is None:
+        file_path = DEFAULT_DATA_FILE
+        if not file_path.exists():
+            return create_sample_data()
 
-        if not path.is_file():
-            raise FileNotFoundError(f"Dataset not found: {path}")
+    file_path = Path(file_path)
 
-        return pd.read_csv(path)
+    if not file_path.exists():
+        raise FileNotFoundError(
+            f"Dataset not found: {file_path}"
+        )
 
-    if DEFAULT_DATA_FILE.is_file():
-        return pd.read_csv(DEFAULT_DATA_FILE)
+    if file_path.suffix.lower() != ".csv":
+        raise ValueError("The dataset must be a CSV file.")
 
-    print("Dataset not found. Using the built-in sample dataset.")
-    return create_sample_data()
+    return pd.read_csv(file_path)
 
 
 def get_dataset_overview(df):
     """Return basic information about the dataset."""
     return {
-        "total_students": len(df),
+        "total_records": len(df),
         "total_columns": len(df.columns),
         "column_names": list(df.columns),
-        "missing_values": int(df.isna().sum().sum()),
+        "missing_values": int(df.isnull().sum().sum()),
         "duplicate_rows": int(df.duplicated().sum()),
     }
 
 
-def save_data(df, file_path):
-    """Save student records to a CSV file."""
-    path = Path(file_path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(path, index=False)
-    return path
+def save_data(df, file_path=None):
+    """Save the dataset to a CSV file."""
+    if file_path is None:
+        file_path = DEFAULT_DATA_FILE
+
+    file_path = Path(file_path)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(file_path, index=False)
+
+    return file_path
