@@ -21,7 +21,7 @@ MARK_COLUMNS = [
 
 
 def validate_data(df):
-    """Validate student data and raise errors for invalid records."""
+    """Validate student records and reject invalid data."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
 
@@ -35,33 +35,37 @@ def validate_data(df):
             f"Missing required columns: {sorted(missing_columns)}"
         )
 
-    if df[REQUIRED_COLUMNS].isnull().any().any():
-        raise ValueError("The dataset contains missing required values.")
+    data = df[REQUIRED_COLUMNS].copy()
 
     for column in REQUIRED_COLUMNS:
-        numeric_values = pd.to_numeric(df[column], errors="coerce")
+        data[column] = pd.to_numeric(data[column], errors="coerce")
 
-        if numeric_values.isnull().any():
+        if data[column].isna().any():
             raise ValueError(
-                f"Column '{column}' contains non-numeric values."
+                f"Column '{column}' contains missing or non-numeric values."
             )
 
-        if not np.isfinite(numeric_values.to_numpy(dtype=float)).all():
+        values = data[column].to_numpy(dtype=float)
+
+        if not np.isfinite(values).all():
             raise ValueError(
                 f"Column '{column}' contains non-finite values."
             )
 
-    if (df["Student_ID"] <= 0).any():
+    if (data["Student_ID"] <= 0).any():
         raise ValueError("Student IDs must be positive.")
 
-    if df["Student_ID"].duplicated().any():
+    if data["Student_ID"].duplicated().any():
         raise ValueError("Student IDs must be unique.")
 
-    if (df["Study_Hours"] < 0).any():
+    if not data["Student_ID"].apply(float.is_integer).all():
+        raise ValueError("Student IDs must be whole numbers.")
+
+    if (data["Study_Hours"] < 0).any():
         raise ValueError("Study hours cannot be negative.")
 
     for column in MARK_COLUMNS:
-        if not df[column].between(0, 100).all():
+        if not data[column].between(0, 100).all():
             raise ValueError(
                 f"Values in '{column}' must be between 0 and 100."
             )
@@ -78,14 +82,16 @@ def get_duplicate_summary(df):
     """Count duplicate rows and duplicate student IDs."""
     return {
         "duplicate_rows": int(df.duplicated().sum()),
-        "duplicate_student_ids": int(
-            df["Student_ID"].duplicated().sum()
-        ) if "Student_ID" in df.columns else 0,
+        "duplicate_student_ids": (
+            int(df["Student_ID"].duplicated().sum())
+            if "Student_ID" in df.columns
+            else 0
+        ),
     }
 
 
 def get_data_quality_summary(df):
-    """Return a summary of basic dataset quality checks."""
+    """Return a basic data quality summary."""
     return {
         "total_records": len(df),
         "total_columns": len(df.columns),
