@@ -38,7 +38,7 @@ def create_sample_data():
 
 
 def load_data(file_path=None):
-    """Load student data from a CSV file or use the sample dataset."""
+    """Load a CSV dataset or use sample records when the default is absent."""
     if file_path is None:
         file_path = DEFAULT_DATA_FILE
         if not file_path.exists():
@@ -46,10 +46,8 @@ def load_data(file_path=None):
 
     file_path = Path(file_path)
 
-    if not file_path.exists():
-        raise FileNotFoundError(
-            f"Dataset not found: {file_path}"
-        )
+    if not file_path.is_file():
+        raise FileNotFoundError(f"Dataset not found: {file_path}")
 
     if file_path.suffix.lower() != ".csv":
         raise ValueError("The dataset must be a CSV file.")
@@ -69,7 +67,7 @@ def get_dataset_overview(df):
 
 
 def save_data(df, file_path=None):
-    """Save the dataset to a CSV file."""
+    """Save student records to a CSV file."""
     if file_path is None:
         file_path = DEFAULT_DATA_FILE
 
