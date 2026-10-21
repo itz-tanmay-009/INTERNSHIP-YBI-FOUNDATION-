@@ -1,83 +1,74 @@
 
 from pathlib import Path
 
-from analysis import (
-    get_performance_categories,
-    compare_previous_and_final_marks,
-)
+import pandas as pd
+
+from analysis import get_performance_categories
+
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "output"
 
 
 def create_grade_summary(df):
-    """Create student-level and category-level summaries."""
+    """Summarize student counts and percentages by performance category."""
     categorized = get_performance_categories(df)
 
-    summary = categorized[
-        [
-            "Student_ID",
-            "Previous_Marks",
-            "Assignment_Marks",
-            "Final_Marks",
-            "Performance_Category",
-        ]
-    ].copy()
-
-    comparison = compare_previous_and_final_marks(df)
-
-    summary = summary.merge(
-        comparison[
-            ["Student_ID", "Mark_Change", "Improvement_Status"]
-        ],
-        on="Student_ID",
-        how="left",
-        validate="one_to_one",
+    summary = (
+        categorized["Performance_Category"]
+        .value_counts(sort=False)
+        .rename_axis("Performance_Category")
+        .reset_index(name="Student_Count")
     )
 
-    groups = summary.groupby("Performance_Category", observed=False)
+    total_students = len(categorized)
 
-    counts = groups.size().rename("Student_Count").reset_index()
+    if total_students:
+        summary["Percentage"] = (
+            summary["Student_Count"] / total_students * 100
+        ).round(2)
+    else:
+        summary["Percentage"] = 0.0
 
-    averages = (
-        groups["Final_Marks"]
-        .mean()
-        .round(2)
-        .rename("Average_Final_Marks")
-        .reset_index()
-    )
-
-    return summary, counts, averages
+    return summary
 
 
-def save_grade_summary(
-    summary,
-    average_marks=None,
-    output_file="output/grade_summary.csv",
-):
-    """Save a summary DataFrame as a CSV file."""
-    if isinstance(average_marks, (str, Path)):
-        output_file = average_marks
+def create_student_grade_details(df):
+    """Return student IDs, final marks, and performance categories."""
+    categorized = get_performance_categories(df)
 
-    path = Path(output_file)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    summary.to_csv(path, index=False)
+    columns = [
+        "Student_ID",
+        "Final_Marks",
+        "Performance_Category",
+    ]
 
-    return path
+    return categorized[columns].sort_values(
+        by="Final_Marks",
+        ascending=False,
+    ).reset_index(drop=True)
 
 
-def save_all_grade_summaries(df, output_dir="output"):
-    """Save student summaries and category statistics."""
-    directory = Path(output_dir)
-    directory.mkdir(parents=True, exist_ok=True)
+def save_all_grade_summaries(df, output_dir=None):
+    """Save category summaries and student grade details to CSV."""
+    if output_dir is None:
+        output_dir = DEFAULT_OUTPUT_DIR
 
-    summary, counts, averages = create_grade_summary(df)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    paths = {
-        "summary": directory / "grade_summary.csv",
-        "counts": directory / "grade_counts.csv",
-        "averages": directory / "grade_average_marks.csv",
+    summary = create_grade_summary(df)
+    details = create_student_grade_details(df)
+
+    summary_path = output_dir / "grade_summary.csv"
+    details_path = output_dir / "student_grade_details.csv"
+
+    summary.to_csv(summary_path, index=False)
+    details.to_csv(details_path, index=False)
+
+    return {
+        "summary": summary,
+        "details": details,
+        "summary_path": summary_path,
+        "details_path": details_path,
     }
-
-    summary.to_csv(paths["summary"], index=False)
-    counts.to_csv(paths["counts"], index=False)
-    averages.to_csv(paths["averages"], index=False)
-
-    return paths
