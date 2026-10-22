@@ -46,23 +46,6 @@ def load_data(file_path=None):
 
     file_path = Path(file_path)
 
-    if not file_path.exists():
-        raise FileNotFoundError(
-            f"Dataset not found: {file_path}"
-        )
-
-    if file_path.suffix.lower() != ".csv":
-        raise ValueError("The dataset must be a CSV file.")
-
-    """Load student records from CSV or use sample data."""
-    if file_path is None:
-        file_path = DEFAULT_DATA_FILE
-
-        if not file_path.exists():
-            return create_sample_data()
-
-    file_path = Path(file_path)
-
     if not file_path.is_file():
         raise FileNotFoundError(f"Dataset not found: {file_path}")
 
