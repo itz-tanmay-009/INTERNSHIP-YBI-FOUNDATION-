@@ -2,7 +2,11 @@
 from pathlib import Path
 
 from data import load_data
-from validation import validate_data, get_data_quality_summary
+from validation import (
+    normalize_data,
+    validate_data,
+    get_data_quality_summary,
+)
 
 from analysis import (
     calculate_averages,
@@ -25,20 +29,19 @@ OUTPUT_DIR = PROJECT_ROOT / "output"
 
 def main():
     """Run the complete student performance analysis project."""
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
     print("=" * 55)
     print("STUDENT PERFORMANCE ANALYSIS")
     print("=" * 55)
 
-    df = load_data()
+    df = normalize_data(load_data())
 
     validate_data(df)
     quality = get_data_quality_summary(df)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     print("\nDATA QUALITY SUMMARY")
     print("-" * 35)
-    print(f"Total records: {quality['total_rows']}")
+    print(f"Total records: {quality['total_records']}")
     print(f"Total columns: {quality['total_columns']}")
     print(f"Missing values: {quality['missing_values']}")
     print(f"Duplicate rows: {quality['duplicate_rows']}")
