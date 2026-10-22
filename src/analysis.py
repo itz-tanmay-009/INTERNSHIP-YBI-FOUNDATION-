@@ -30,6 +30,7 @@ def get_top_student(df):
     """Find the student with the highest final marks."""
     if df.empty:
         raise ValueError("No student records are available.")
+
     return df.loc[df["Final_Marks"].idxmax()].to_dict()
 
 
@@ -37,6 +38,7 @@ def get_lowest_student(df):
     """Find the student with the lowest final marks."""
     if df.empty:
         raise ValueError("No student records are available.")
+
     return df.loc[df["Final_Marks"].idxmin()].to_dict()
 
 
@@ -57,6 +59,7 @@ def calculate_pass_percentage(df, pass_mark=PASS_MARK):
     """Calculate the percentage of students who passed."""
     if not 0 <= pass_mark <= 100:
         raise ValueError("Pass mark must be between 0 and 100.")
+
     if df.empty:
         return 0.0
 
@@ -65,7 +68,7 @@ def calculate_pass_percentage(df, pass_mark=PASS_MARK):
 
 
 def compare_previous_and_final_marks(df):
-    """Compare previous and final marks."""
+    """Compare previous and final marks for each student."""
     result = df[
         ["Student_ID", "Previous_Marks", "Final_Marks"]
     ].copy()

@@ -38,7 +38,7 @@ def create_sample_data():
 
 
 def load_data(file_path=None):
-    """Load student data from a CSV file or use the sample dataset."""
+    """Load a CSV dataset or use sample records when the default is absent."""
     if file_path is None:
         file_path = DEFAULT_DATA_FILE
         if not file_path.exists():
