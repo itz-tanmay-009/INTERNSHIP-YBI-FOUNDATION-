@@ -20,6 +20,27 @@ MARK_COLUMNS = [
 ]
 
 
+def normalize_data(df):
+    """Convert required numeric columns without mutating the input."""
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+
+    result = df.copy()
+
+    for column in REQUIRED_COLUMNS:
+        if column not in result.columns:
+            continue
+
+        try:
+            result[column] = pd.to_numeric(result[column], errors="raise")
+        except (TypeError, ValueError) as error:
+            raise ValueError(
+                f"Column '{column}' contains non-numeric values."
+            ) from error
+
+    return result
+
+
 def validate_data(df):
     """Validate student data and raise errors for invalid records."""
     if not isinstance(df, pd.DataFrame):
@@ -38,6 +59,8 @@ def validate_data(df):
     if df[REQUIRED_COLUMNS].isnull().any().any():
         raise ValueError("The dataset contains missing required values.")
 
+    numeric_columns = {}
+
     for column in REQUIRED_COLUMNS:
         numeric_values = pd.to_numeric(df[column], errors="coerce")
 
@@ -51,17 +74,24 @@ def validate_data(df):
                 f"Column '{column}' contains non-finite values."
             )
 
-    if (df["Student_ID"] <= 0).any():
+        numeric_columns[column] = numeric_values
+
+    student_ids = numeric_columns["Student_ID"]
+
+    if (student_ids <= 0).any():
         raise ValueError("Student IDs must be positive.")
 
-    if df["Student_ID"].duplicated().any():
+    if (student_ids % 1 != 0).any():
+        raise ValueError("Student IDs must be whole numbers.")
+
+    if student_ids.duplicated().any():
         raise ValueError("Student IDs must be unique.")
 
-    if (df["Study_Hours"] < 0).any():
+    if (numeric_columns["Study_Hours"] < 0).any():
         raise ValueError("Study hours cannot be negative.")
 
     for column in MARK_COLUMNS:
-        if not df[column].between(0, 100).all():
+        if not numeric_columns[column].between(0, 100).all():
             raise ValueError(
                 f"Values in '{column}' must be between 0 and 100."
             )
