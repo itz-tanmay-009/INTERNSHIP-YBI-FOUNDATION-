@@ -41,8 +41,16 @@ def get_lowest_student(df):
 
 
 def find_top_three_students(df):
-    """Return the three students with the highest final marks."""
-    return df.nlargest(3, "Final_Marks").reset_index(drop=True)
+    """Return the three highest-scoring students in a consistent order."""
+    return (
+        df.sort_values(
+            ["Final_Marks", "Student_ID"],
+            ascending=[False, True],
+            kind="stable",
+        )
+        .head(3)
+        .reset_index(drop=True)
+    )
 
 
 def calculate_pass_percentage(df, pass_mark=PASS_MARK):
