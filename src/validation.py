@@ -87,6 +87,7 @@ def get_duplicate_summary(df):
 def get_data_quality_summary(df):
     """Return a summary of basic dataset quality checks."""
     return {
+        "total_rows": len(df),
         "total_records": len(df),
         "total_columns": len(df.columns),
         "missing_values": int(df.isnull().sum().sum()),

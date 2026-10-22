@@ -84,8 +84,6 @@ def get_dataset_overview(df):
 
 
 def save_data(df, file_path=None):
-    """Save the dataset to a CSV file."""
-=======
     """Save student records to a CSV file."""
     if file_path is None:
         file_path = DEFAULT_DATA_FILE
