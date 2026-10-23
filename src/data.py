@@ -38,10 +38,11 @@ def create_sample_data():
 
 
 def load_data(file_path=None):
-    """Load a CSV dataset or use sample records when the default is absent."""
+    """Load student records from a CSV file or use sample data."""
     if file_path is None:
         file_path = DEFAULT_DATA_FILE
-        if not file_path.exists():
+
+        if not file_path.is_file():
             return create_sample_data()
 
     file_path = Path(file_path)
@@ -56,13 +57,16 @@ def load_data(file_path=None):
 
 
 def get_dataset_overview(df):
-    """Return basic information about the dataset."""
+    """Return a concise overview of the dataset."""
     return {
-        "total_records": len(df),
-        "total_columns": len(df.columns),
+        "total_records": int(len(df)),
+        "total_columns": int(len(df.columns)),
         "column_names": list(df.columns),
         "missing_values": int(df.isnull().sum().sum()),
         "duplicate_rows": int(df.duplicated().sum()),
+        "memory_usage_bytes": int(
+            df.memory_usage(index=True, deep=True).sum()
+        ),
     }
 
 
@@ -76,3 +80,20 @@ def save_data(df, file_path=None):
     df.to_csv(file_path, index=False)
 
     return file_path
+
+
+def get_column_summary(df):
+    """Summarize each column's data type and missing values."""
+    return pd.DataFrame({
+        "Column": df.columns,
+        "Data_Type": [
+            str(df[column].dtype) for column in df.columns
+        ],
+        "Missing_Values": [
+            int(df[column].isnull().sum()) for column in df.columns
+        ],
+        "Unique_Values": [
+            int(df[column].nunique(dropna=True))
+            for column in df.columns
+        ],
+    })

@@ -5,149 +5,144 @@ import matplotlib
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
-
-from analysis import get_performance_categories
-
-
-def save_chart(fig, output_file=None):
-    """Save a chart when requested and always close the figure."""
-    try:
-        if output_file:
-            path = Path(output_file)
-            path.parent.mkdir(parents=True, exist_ok=True)
-            fig.savefig(path, dpi=150, bbox_inches="tight")
-    finally:
-        plt.close(fig)
+import pandas as pd
 
 
-def plot_marks_distribution(df, output_file=None):
-    """Show the distribution of final marks."""
-    fig, ax = plt.subplots(figsize=(8, 5))
-
-    ax.hist(df["Final_Marks"], bins=8, edgecolor="black")
-    ax.set_title("Distribution of Final Marks")
-    ax.set_xlabel("Final Marks")
-    ax.set_ylabel("Number of Students")
-    ax.grid(axis="y", alpha=0.25)
-
-    save_chart(fig, output_file)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "output" / "charts"
 
 
-def plot_study_hours_vs_marks(df, output_file=None):
-    """Compare study hours and final marks."""
-    fig, ax = plt.subplots(figsize=(8, 5))
+def create_output_directory(output_dir=None):
+    """Create the directory used to store charts."""
+    if output_dir is None:
+        output_dir = DEFAULT_OUTPUT_DIR
 
-    ax.scatter(df["Study_Hours"], df["Final_Marks"])
-    ax.set_title("Study Hours vs Final Marks")
-    ax.set_xlabel("Study Hours")
-    ax.set_ylabel("Final Marks")
-    ax.grid(alpha=0.25)
-
-    save_chart(fig, output_file)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    return output_dir
 
 
-def plot_attendance_vs_marks(df, output_file=None):
-    """Compare attendance and final marks."""
-    fig, ax = plt.subplots(figsize=(8, 5))
+def create_marks_comparison_chart(df, output_dir=None):
+    """Compare average marks across assessment categories."""
+    output_dir = create_output_directory(output_dir)
 
-    ax.scatter(df["Attendance"], df["Final_Marks"])
-    ax.set_title("Attendance vs Final Marks")
-    ax.set_xlabel("Attendance (%)")
-    ax.set_ylabel("Final Marks")
-    ax.grid(alpha=0.25)
-
-    save_chart(fig, output_file)
-
-
-def plot_previous_vs_final_marks(df, output_file=None):
-    """Compare previous marks with final marks."""
-    fig, ax = plt.subplots(figsize=(8, 5))
-
-    ax.scatter(df["Previous_Marks"], df["Final_Marks"])
-    ax.set_title("Previous Marks vs Final Marks")
-    ax.set_xlabel("Previous Marks")
-    ax.set_ylabel("Final Marks")
-    ax.grid(alpha=0.25)
-
-    save_chart(fig, output_file)
-
-
-def plot_performance_categories(df, output_file=None):
-    """Show the number of students in each performance category."""
-    categorized = get_performance_categories(df)
-
-    counts = categorized["Performance_Category"].value_counts(
-        sort=False
-    )
-
-    fig, ax = plt.subplots(figsize=(9, 5))
-    counts.plot(kind="bar", ax=ax, edgecolor="black")
-
-    ax.set_title("Student Performance Categories")
-    ax.set_xlabel("Category")
-    ax.set_ylabel("Number of Students")
-    ax.tick_params(axis="x", rotation=20)
-
-    save_chart(fig, output_file)
-
-
-def plot_mark_change(df, output_file=None):
-    """Show changes between previous and final marks."""
-    fig, ax = plt.subplots(figsize=(10, 5))
-
-    changes = df["Final_Marks"] - df["Previous_Marks"]
-
-    ax.bar(df["Student_ID"].astype(str), changes)
-    ax.axhline(0, linestyle="--")
-    ax.set_title("Change in Student Marks")
-    ax.set_xlabel("Student ID")
-    ax.set_ylabel("Change in Marks")
-
-    save_chart(fig, output_file)
-
-
-def plot_average_marks(df, output_file=None):
-    """Compare average previous, assignment, and final marks."""
-    columns = [
-        "Previous_Marks",
-        "Assignment_Marks",
-        "Final_Marks",
-    ]
-
+    columns = ["Previous_Marks", "Assignment_Marks", "Final_Marks"]
     averages = df[columns].mean()
 
     fig, ax = plt.subplots(figsize=(8, 5))
-    averages.plot(kind="bar", ax=ax, edgecolor="black")
+    averages.plot(kind="bar", ax=ax)
 
     ax.set_title("Average Marks Comparison")
     ax.set_xlabel("Assessment")
     ax.set_ylabel("Average Marks")
-    ax.tick_params(axis="x", rotation=15)
-    ax.grid(axis="y", alpha=0.25)
+    ax.set_ylim(0, 100)
+    ax.grid(axis="y", linestyle="--", alpha=0.4)
 
-    save_chart(fig, output_file)
+    fig.tight_layout()
+    path = output_dir / "marks_comparison.png"
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+    return path
 
 
-def create_all_charts(df, output_dir="output/charts"):
-    """Generate and save all project charts."""
-    directory = Path(output_dir)
-    directory.mkdir(parents=True, exist_ok=True)
+def create_study_hours_chart(df, output_dir=None):
+    """Show study hours for each student."""
+    output_dir = create_output_directory(output_dir)
 
-    chart_functions = {
-        "marks_distribution": plot_marks_distribution,
-        "study_hours_vs_marks": plot_study_hours_vs_marks,
-        "attendance_vs_marks": plot_attendance_vs_marks,
-        "previous_vs_final_marks": plot_previous_vs_final_marks,
-        "performance_categories": plot_performance_categories,
-        "mark_change": plot_mark_change,
-        "average_marks": plot_average_marks,
-    }
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.bar(df["Student_ID"], df["Study_Hours"])
 
-    saved_paths = {}
+    ax.set_title("Study Hours by Student")
+    ax.set_xlabel("Student ID")
+    ax.set_ylabel("Study Hours")
+    ax.grid(axis="y", linestyle="--", alpha=0.4)
 
-    for name, function in chart_functions.items():
-        path = directory / f"{name}.png"
-        function(df, path)
-        saved_paths[name] = path
+    fig.tight_layout()
+    path = output_dir / "study_hours.png"
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
 
-    return saved_paths
+    return path
+
+
+def create_attendance_chart(df, output_dir=None):
+    """Show attendance percentages for each student."""
+    output_dir = create_output_directory(output_dir)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.bar(df["Student_ID"], df["Attendance"])
+
+    ax.set_title("Attendance by Student")
+    ax.set_xlabel("Student ID")
+    ax.set_ylabel("Attendance (%)")
+    ax.set_ylim(0, 100)
+    ax.grid(axis="y", linestyle="--", alpha=0.4)
+
+    fig.tight_layout()
+    path = output_dir / "attendance.png"
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+    return path
+
+
+def create_marks_distribution_chart(df, output_dir=None):
+    """Display the distribution of final marks."""
+    output_dir = create_output_directory(output_dir)
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.hist(df["Final_Marks"], bins=8, edgecolor="black")
+
+    ax.set_title("Distribution of Final Marks")
+    ax.set_xlabel("Final Marks")
+    ax.set_ylabel("Number of Students")
+    ax.grid(axis="y", linestyle="--", alpha=0.4)
+
+    fig.tight_layout()
+    path = output_dir / "marks_distribution.png"
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+    return path
+
+
+def create_study_vs_marks_chart(df, output_dir=None):
+    """Explore the relationship between study hours and final marks."""
+    output_dir = create_output_directory(output_dir)
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.scatter(df["Study_Hours"], df["Final_Marks"])
+
+    ax.set_title("Study Hours vs Final Marks")
+    ax.set_xlabel("Study Hours")
+    ax.set_ylabel("Final Marks")
+    ax.grid(True, linestyle="--", alpha=0.4)
+
+    fig.tight_layout()
+    path = output_dir / "study_vs_marks.png"
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+    return path
+
+
+def create_all_charts(df, output_dir=None):
+    """Generate all student performance charts."""
+    output_dir = create_output_directory(output_dir)
+
+    chart_functions = [
+        create_marks_comparison_chart,
+        create_study_hours_chart,
+        create_attendance_chart,
+        create_marks_distribution_chart,
+        create_study_vs_marks_chart,
+    ]
+
+    chart_paths = {}
+
+    for chart_function in chart_functions:
+        chart_path = chart_function(df, output_dir)
+        chart_paths[chart_path.stem] = chart_path
+
+    return chart_paths

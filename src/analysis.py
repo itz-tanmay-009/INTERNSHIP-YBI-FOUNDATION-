@@ -27,7 +27,7 @@ def calculate_averages(df):
 
 
 def get_top_student(df):
-    """Find the student with the highest final marks."""
+    """Return the highest-scoring student."""
     if df.empty:
         raise ValueError("No student records are available.")
 
@@ -35,7 +35,7 @@ def get_top_student(df):
 
 
 def get_lowest_student(df):
-    """Find the student with the lowest final marks."""
+    """Return the lowest-scoring student."""
     if df.empty:
         raise ValueError("No student records are available.")
 
@@ -43,16 +43,8 @@ def get_lowest_student(df):
 
 
 def find_top_three_students(df):
-    """Return the three highest-scoring students in a consistent order."""
-    return (
-        df.sort_values(
-            ["Final_Marks", "Student_ID"],
-            ascending=[False, True],
-            kind="stable",
-        )
-        .head(3)
-        .reset_index(drop=True)
-    )
+    """Return the three students with the highest final marks."""
+    return df.nlargest(3, "Final_Marks").reset_index(drop=True)
 
 
 def calculate_pass_percentage(df, pass_mark=PASS_MARK):
@@ -78,9 +70,9 @@ def compare_previous_and_final_marks(df):
     )
 
     result["Improvement_Status"] = result["Mark_Change"].map(
-        lambda change: (
-            "Improved" if change > 0
-            else "Declined" if change < 0
+        lambda value: (
+            "Improved" if value > 0
+            else "Declined" if value < 0
             else "Unchanged"
         )
     )
@@ -108,13 +100,14 @@ def get_improvement_summary(df):
         "unchanged_students": int((changes == 0).sum()),
         "average_mark_change": (
             round(float(changes.mean()), 2)
-            if not changes.empty else 0.0
+            if not changes.empty
+            else 0.0
         ),
     }
 
 
 def get_performance_categories(df):
-    """Assign a performance category based on final marks."""
+    """Assign performance categories based on final marks."""
     result = df.copy()
 
     result["Performance_Category"] = pd.cut(
@@ -130,6 +123,7 @@ def get_performance_categories(df):
 def get_grade_counts(df):
     """Count students in each performance category."""
     categorized = get_performance_categories(df)
+
     return categorized["Performance_Category"].value_counts(
         sort=False
     ).to_dict()
@@ -146,34 +140,50 @@ def get_descriptive_statistics(df):
 
 
 def get_attendance_summary(df):
-    """Summarize student attendance."""
+    """Summarize attendance using mean and median."""
     attendance = df["Attendance"]
 
     if attendance.empty:
         return {
             "average_attendance": 0.0,
+            "median_attendance": 0.0,
             "low_attendance_students": 0,
         }
 
     return {
         "average_attendance": round(float(attendance.mean()), 2),
+        "median_attendance": round(float(attendance.median()), 2),
         "low_attendance_students": int((attendance < 75).sum()),
     }
 
 
 def get_study_hours_summary(df):
-    """Summarize study hour patterns in the dataset."""
-    study_hours = df["Study_Hours"]
+    """Summarize study hours and identify low study time."""
+    hours = df["Study_Hours"]
 
-    if study_hours.empty:
+    if hours.empty:
         return {
             "average_study_hours": 0.0,
+            "median_study_hours": 0.0,
             "low_study_hours_students": 0,
         }
 
     return {
-        "average_study_hours": round(float(study_hours.mean()), 2),
-        "low_study_hours_students": int((study_hours < 2).sum()),
+        "average_study_hours": round(float(hours.mean()), 2),
+        "median_study_hours": round(float(hours.median()), 2),
+        "low_study_hours_students": int((hours < 2).sum()),
+    }
+
+
+def get_score_distribution(df):
+    """Count students within final-mark ranges."""
+    marks = df["Final_Marks"]
+
+    return {
+        "Below 40": int((marks < 40).sum()),
+        "40 to 59": int(((marks >= 40) & (marks < 60)).sum()),
+        "60 to 79": int(((marks >= 60) & (marks < 80)).sum()),
+        "80 to 100": int(((marks >= 80) & (marks <= 100)).sum()),
     }
 
 
@@ -222,7 +232,9 @@ def get_student_performance_summary(df):
     return {
         "total_students": len(df),
         "high_performers": int((marks >= 80).sum()),
-        "average_performers": int(((marks >= 50) & (marks < 80)).sum()),
+        "average_performers": int(
+            ((marks >= 50) & (marks < 80)).sum()
+        ),
         "low_performers": int((marks < 50).sum()),
         "average_final_marks": round(float(marks.mean()), 2),
     }
@@ -283,6 +295,7 @@ def generate_insights(df):
     improvement = get_improvement_summary(df)
     attendance = get_attendance_summary(df)
     study = get_study_hours_summary(df)
+    distribution = get_score_distribution(df)
 
     return [
         f"Total students analyzed: {len(df)}",
@@ -290,11 +303,13 @@ def generate_insights(df):
         f"Average study hours: {study['average_study_hours']:.2f}",
         f"Average attendance: {attendance['average_attendance']:.2f}%",
         f"Pass percentage: {calculate_pass_percentage(df):.2f}%",
+        f"Median final marks: {df['Final_Marks'].median():.2f}",
         f"Students who improved: {improvement['improved_students']}",
         f"Students who declined: {improvement['declined_students']}",
         f"Average mark change: {improvement['average_mark_change']:.2f}",
+        f"Students below 40 marks: {distribution['Below 40']}",
         (
-            "Students with attendance below 75%: "
+            "Students below 75% attendance: "
             f"{attendance['low_attendance_students']}"
         ),
         (
