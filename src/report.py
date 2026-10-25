@@ -1,4 +1,5 @@
 
+import math
 from pathlib import Path
 
 from analysis import (
@@ -74,7 +75,10 @@ def generate_report(df):
     for column in correlations.columns:
         if column != "Final_Marks":
             value = correlations.loc[column, "Final_Marks"]
-            lines.append(f"{column}: {value:.2f}")
+            formatted_value = (
+                f"{value:.2f}" if math.isfinite(float(value)) else "N/A"
+            )
+            lines.append(f"{column}: {formatted_value}")
 
     lines.extend([
         "",
