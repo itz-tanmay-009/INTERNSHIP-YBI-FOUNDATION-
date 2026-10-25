@@ -12,7 +12,7 @@ NUMERIC_COLUMNS = [
     "Final_Marks",
 ]
 
-PERFORMANCE_BINS = [-0.001, 39, 59, 79, 100]
+PERFORMANCE_BINS = [0, 40, 60, 80, 100.001]
 PERFORMANCE_LABELS = [
     "Needs Improvement",
     "Satisfactory",
@@ -44,7 +44,15 @@ def get_lowest_student(df):
 
 def find_top_three_students(df):
     """Return the three students with the highest final marks."""
-    return df.nlargest(3, "Final_Marks").reset_index(drop=True)
+    return (
+        df.sort_values(
+            by="Final_Marks",
+            ascending=False,
+            kind="stable",
+        )
+        .head(3)
+        .reset_index(drop=True)
+    )
 
 
 def calculate_pass_percentage(df, pass_mark=PASS_MARK):
@@ -115,6 +123,7 @@ def get_performance_categories(df):
         bins=PERFORMANCE_BINS,
         labels=PERFORMANCE_LABELS,
         include_lowest=True,
+        right=False,
     )
 
     return result
