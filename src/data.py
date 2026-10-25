@@ -76,6 +76,9 @@ def save_data(df, file_path=None):
         file_path = DEFAULT_DATA_FILE
 
     file_path = Path(file_path)
+    if file_path.suffix.lower() != ".csv":
+        raise ValueError("The dataset must be saved as a CSV file.")
+
     file_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(file_path, index=False)
 
