@@ -20,6 +20,33 @@ MARK_COLUMNS = [
 ]
 
 
+def normalize_data(df):
+    """Trim column-name whitespace and convert required fields to numbers."""
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+
+    normalized_columns = [
+        column.strip() if isinstance(column, str) else column
+        for column in df.columns
+    ]
+    if pd.Index(normalized_columns).has_duplicates:
+        raise ValueError(
+            "Column names must be unique after trimming whitespace."
+        )
+
+    normalized = df.copy()
+    normalized.columns = normalized_columns
+
+    for column in REQUIRED_COLUMNS:
+        if column in normalized.columns:
+            normalized[column] = pd.to_numeric(
+                normalized[column],
+                errors="coerce",
+            )
+
+    return normalized
+
+
 def validate_data(df):
     """Validate student records and reject invalid data."""
     if not isinstance(df, pd.DataFrame):
