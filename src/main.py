@@ -27,17 +27,19 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = PROJECT_ROOT / "output"
 
 
-def main():
+def main(data_file=None, output_dir=None):
     """Run the complete student performance analysis project."""
+    output_dir = OUTPUT_DIR if output_dir is None else Path(output_dir)
+
     print("=" * 55)
     print("STUDENT PERFORMANCE ANALYSIS")
     print("=" * 55)
 
-    df = normalize_data(load_data())
+    df = normalize_data(load_data(data_file))
 
     validate_data(df)
     quality = get_data_quality_summary(df)
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     print("\nDATA QUALITY SUMMARY")
     print("-" * 35)
@@ -76,36 +78,46 @@ def main():
     print("-" * 35)
 
     support_students = find_students_needing_support(df)
-    support_path = OUTPUT_DIR / "students_needing_support.csv"
+    support_path = output_dir / "students_needing_support.csv"
 
     if support_students.empty:
         print("No students scored below the pass mark.")
     else:
         print(support_students.to_string(index=False))
-    support_students.to_csv(support_path, index=False)
+    support_students.to_csv(
+        support_path,
+        index=False,
+        encoding="utf-8-sig",
+    )
 
     print("\nGENERATING OUTPUT FILES")
     print("-" * 35)
 
-    save_all_grade_summaries(df, OUTPUT_DIR)
+    save_all_grade_summaries(df, output_dir)
 
-    statistics_path = OUTPUT_DIR / "descriptive_statistics.csv"
-    get_descriptive_statistics(df).to_csv(statistics_path)
+    statistics_path = output_dir / "descriptive_statistics.csv"
+    get_descriptive_statistics(df).to_csv(
+        statistics_path,
+        encoding="utf-8-sig",
+    )
 
-    correlation_path = OUTPUT_DIR / "correlation_matrix.csv"
-    get_correlation_matrix(df).to_csv(correlation_path)
+    correlation_path = output_dir / "correlation_matrix.csv"
+    get_correlation_matrix(df).to_csv(
+        correlation_path,
+        encoding="utf-8-sig",
+    )
 
     chart_paths = create_all_charts(
         df,
-        OUTPUT_DIR / "charts",
+        output_dir / "charts",
     )
 
     report_path = save_report(
         generate_report(df),
-        OUTPUT_DIR / "student_performance_report.txt",
+        output_dir / "student_performance_report.txt",
     )
 
-    print(f"Grade summaries saved in: {OUTPUT_DIR}")
+    print(f"Grade summaries saved in: {output_dir}")
     print(f"Support student list saved in: {support_path}")
     print(f"Statistics saved in: {statistics_path}")
     print(f"Correlation matrix saved in: {correlation_path}")
