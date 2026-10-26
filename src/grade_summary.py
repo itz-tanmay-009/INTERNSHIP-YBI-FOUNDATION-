@@ -46,6 +46,7 @@ def create_student_grade_details(df):
     return categorized[columns].sort_values(
         by="Final_Marks",
         ascending=False,
+        kind="stable",
     ).reset_index(drop=True)
 
 
