@@ -10,6 +10,7 @@ from analysis import (
     get_grade_counts,
     get_improvement_summary,
     get_correlation_matrix,
+    get_score_distribution,
     generate_insights,
 )
 
@@ -24,6 +25,7 @@ def generate_report(df):
     lowest = get_lowest_student(df)
     categories = get_grade_counts(df)
     improvement = get_improvement_summary(df)
+    score_distribution = get_score_distribution(df)
     correlations = get_correlation_matrix(df)
 
     lines = [
@@ -68,7 +70,18 @@ def generate_report(df):
 
     lines.extend([
         "",
-        "5. CORRELATION WITH FINAL MARKS",
+        "5. FINAL MARKS DISTRIBUTION",
+        "-" * 60,
+    ])
+
+    lines.extend(
+        f"{range_name}: {count} students"
+        for range_name, count in score_distribution.items()
+    )
+
+    lines.extend([
+        "",
+        "6. CORRELATION WITH FINAL MARKS",
         "-" * 60,
     ])
 
@@ -82,7 +95,7 @@ def generate_report(df):
 
     lines.extend([
         "",
-        "6. AUTOMATED INSIGHTS",
+        "7. AUTOMATED INSIGHTS",
         "-" * 60,
     ])
 
