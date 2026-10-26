@@ -99,11 +99,17 @@ def validate_data(df):
 
 def get_missing_value_summary(df):
     """Count missing values in each column."""
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+
     return df.isnull().sum().to_dict()
 
 
 def get_duplicate_summary(df):
     """Count duplicate rows and duplicate student IDs."""
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+
     return {
         "duplicate_rows": int(df.duplicated().sum()),
         "duplicate_student_ids": (
@@ -116,6 +122,9 @@ def get_duplicate_summary(df):
 
 def get_data_quality_summary(df):
     """Return a summary of common data quality issues."""
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+
     missing_columns = sorted(
         set(REQUIRED_COLUMNS) - set(df.columns)
     )
