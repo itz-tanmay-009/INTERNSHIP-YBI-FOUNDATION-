@@ -76,15 +76,13 @@ def main():
     print("-" * 35)
 
     support_students = find_students_needing_support(df)
+    support_path = OUTPUT_DIR / "students_needing_support.csv"
 
     if support_students.empty:
         print("No students scored below the pass mark.")
     else:
         print(support_students.to_string(index=False))
-        support_students.to_csv(
-            OUTPUT_DIR / "students_needing_support.csv",
-            index=False,
-        )
+    support_students.to_csv(support_path, index=False)
 
     print("\nGENERATING OUTPUT FILES")
     print("-" * 35)
@@ -108,6 +106,7 @@ def main():
     )
 
     print(f"Grade summaries saved in: {OUTPUT_DIR}")
+    print(f"Support student list saved in: {support_path}")
     print(f"Statistics saved in: {statistics_path}")
     print(f"Correlation matrix saved in: {correlation_path}")
     print(f"Charts generated: {len(chart_paths)}")
