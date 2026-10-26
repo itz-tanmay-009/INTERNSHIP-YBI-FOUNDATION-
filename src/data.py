@@ -53,7 +53,7 @@ def load_data(file_path=None):
     if file_path.suffix.lower() != ".csv":
         raise ValueError("The dataset must be a CSV file.")
 
-    return pd.read_csv(file_path)
+    return pd.read_csv(file_path, encoding="utf-8-sig")
 
 
 def get_dataset_overview(df):
