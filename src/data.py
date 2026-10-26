@@ -80,7 +80,7 @@ def save_data(df, file_path=None):
         raise ValueError("The dataset must be saved as a CSV file.")
 
     file_path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(file_path, index=False)
+    df.to_csv(file_path, index=False, encoding="utf-8-sig")
 
     return file_path
 
