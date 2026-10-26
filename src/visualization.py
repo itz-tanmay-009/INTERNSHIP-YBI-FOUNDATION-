@@ -22,6 +22,16 @@ def create_output_directory(output_dir=None):
     return output_dir
 
 
+def _save_chart(fig, output_dir, filename):
+    path = output_dir / filename
+    try:
+        fig.tight_layout()
+        fig.savefig(path, dpi=150)
+    finally:
+        plt.close(fig)
+    return path
+
+
 def create_marks_comparison_chart(df, output_dir=None):
     """Compare average marks across assessment categories."""
     output_dir = create_output_directory(output_dir)
@@ -38,12 +48,7 @@ def create_marks_comparison_chart(df, output_dir=None):
     ax.set_ylim(0, 100)
     ax.grid(axis="y", linestyle="--", alpha=0.4)
 
-    fig.tight_layout()
-    path = output_dir / "marks_comparison.png"
-    fig.savefig(path, dpi=150)
-    plt.close(fig)
-
-    return path
+    return _save_chart(fig, output_dir, "marks_comparison.png")
 
 
 def create_study_hours_chart(df, output_dir=None):
@@ -58,12 +63,7 @@ def create_study_hours_chart(df, output_dir=None):
     ax.set_ylabel("Study Hours")
     ax.grid(axis="y", linestyle="--", alpha=0.4)
 
-    fig.tight_layout()
-    path = output_dir / "study_hours.png"
-    fig.savefig(path, dpi=150)
-    plt.close(fig)
-
-    return path
+    return _save_chart(fig, output_dir, "study_hours.png")
 
 
 def create_attendance_chart(df, output_dir=None):
@@ -79,12 +79,7 @@ def create_attendance_chart(df, output_dir=None):
     ax.set_ylim(0, 100)
     ax.grid(axis="y", linestyle="--", alpha=0.4)
 
-    fig.tight_layout()
-    path = output_dir / "attendance.png"
-    fig.savefig(path, dpi=150)
-    plt.close(fig)
-
-    return path
+    return _save_chart(fig, output_dir, "attendance.png")
 
 
 def create_marks_distribution_chart(df, output_dir=None):
@@ -99,12 +94,7 @@ def create_marks_distribution_chart(df, output_dir=None):
     ax.set_ylabel("Number of Students")
     ax.grid(axis="y", linestyle="--", alpha=0.4)
 
-    fig.tight_layout()
-    path = output_dir / "marks_distribution.png"
-    fig.savefig(path, dpi=150)
-    plt.close(fig)
-
-    return path
+    return _save_chart(fig, output_dir, "marks_distribution.png")
 
 
 def create_study_vs_marks_chart(df, output_dir=None):
@@ -119,12 +109,7 @@ def create_study_vs_marks_chart(df, output_dir=None):
     ax.set_ylabel("Final Marks")
     ax.grid(True, linestyle="--", alpha=0.4)
 
-    fig.tight_layout()
-    path = output_dir / "study_vs_marks.png"
-    fig.savefig(path, dpi=150)
-    plt.close(fig)
-
-    return path
+    return _save_chart(fig, output_dir, "study_vs_marks.png")
 
 
 def create_all_charts(df, output_dir=None):
