@@ -114,6 +114,26 @@ def create_study_vs_marks_chart(df, output_dir=None):
 
 def create_all_charts(df, output_dir=None):
     """Generate all student performance charts."""
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+
+    if df.empty:
+        raise ValueError("Cannot create charts from an empty dataset.")
+
+    required_columns = {
+        "Student_ID",
+        "Study_Hours",
+        "Attendance",
+        "Previous_Marks",
+        "Assignment_Marks",
+        "Final_Marks",
+    }
+    missing_columns = required_columns - set(df.columns)
+    if missing_columns:
+        raise ValueError(
+            f"Missing required columns: {sorted(missing_columns)}"
+        )
+
     output_dir = create_output_directory(output_dir)
 
     chart_functions = [
