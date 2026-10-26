@@ -64,8 +64,8 @@ def save_all_grade_summaries(df, output_dir=None):
     summary_path = output_dir / "grade_summary.csv"
     details_path = output_dir / "student_grade_details.csv"
 
-    summary.to_csv(summary_path, index=False)
-    details.to_csv(details_path, index=False)
+    summary.to_csv(summary_path, index=False, encoding="utf-8-sig")
+    details.to_csv(details_path, index=False, encoding="utf-8-sig")
 
     return {
         "summary": summary,
