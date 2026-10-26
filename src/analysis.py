@@ -215,7 +215,7 @@ def find_students_needing_support(df, pass_mark=PASS_MARK):
 
 
 def get_student_performance_summary(df):
-    """Summarize students by performance level."""
+    """Summarize students using the configured performance categories."""
     required_columns = {
         "Student_ID",
         "Study_Hours",
@@ -242,9 +242,9 @@ def get_student_performance_summary(df):
         "total_students": len(df),
         "high_performers": int((marks >= 80).sum()),
         "average_performers": int(
-            ((marks >= 50) & (marks < 80)).sum()
+            ((marks >= 40) & (marks < 80)).sum()
         ),
-        "low_performers": int((marks < 50).sum()),
+        "low_performers": int((marks < 40).sum()),
         "average_final_marks": round(float(marks.mean()), 2),
     }
 
@@ -269,7 +269,7 @@ def get_student_performance_details(df):
     result["Performance_Level"] = result["Final_Marks"].apply(
         lambda marks: (
             "High Performer" if marks >= 80
-            else "Average Performer" if marks >= 50
+            else "Average Performer" if marks >= 40
             else "Low Performer"
         )
     )
@@ -291,6 +291,7 @@ def get_student_performance_details(df):
     return result.sort_values(
         by="Final_Marks",
         ascending=False,
+        kind="stable",
     ).reset_index(drop=True)
 
 
