@@ -31,7 +31,8 @@ def get_top_student(df):
     if df.empty:
         raise ValueError("No student records are available.")
 
-    return df.loc[df["Final_Marks"].idxmax()].to_dict()
+    position = df["Final_Marks"].reset_index(drop=True).idxmax()
+    return df.iloc[position].to_dict()
 
 
 def get_lowest_student(df):
@@ -39,7 +40,8 @@ def get_lowest_student(df):
     if df.empty:
         raise ValueError("No student records are available.")
 
-    return df.loc[df["Final_Marks"].idxmin()].to_dict()
+    position = df["Final_Marks"].reset_index(drop=True).idxmin()
+    return df.iloc[position].to_dict()
 
 
 def find_top_three_students(df):
