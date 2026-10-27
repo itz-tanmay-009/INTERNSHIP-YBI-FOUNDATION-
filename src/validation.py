@@ -52,6 +52,9 @@ def validate_data(df):
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
 
+    if not df.columns.is_unique:
+        raise ValueError("Column names must be unique.")
+
     if df.empty:
         raise ValueError("The dataset is empty.")
 
