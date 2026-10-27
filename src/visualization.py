@@ -87,11 +87,16 @@ def create_marks_distribution_chart(df, output_dir=None):
     output_dir = create_output_directory(output_dir)
 
     fig, ax = plt.subplots(figsize=(8, 5))
-    ax.hist(df["Final_Marks"], bins=8, edgecolor="black")
+    ax.hist(
+        df["Final_Marks"],
+        bins=range(0, 110, 10),
+        edgecolor="black",
+    )
 
     ax.set_title("Distribution of Final Marks")
     ax.set_xlabel("Final Marks")
     ax.set_ylabel("Number of Students")
+    ax.set_xlim(0, 100)
     ax.grid(axis="y", linestyle="--", alpha=0.4)
 
     return _save_chart(fig, output_dir, "marks_distribution.png")
