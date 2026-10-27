@@ -58,6 +58,9 @@ def load_data(file_path=None):
 
 def get_dataset_overview(df):
     """Return a concise overview of the dataset."""
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+
     return {
         "total_records": int(len(df)),
         "total_columns": int(len(df.columns)),
@@ -72,6 +75,9 @@ def get_dataset_overview(df):
 
 def save_data(df, file_path=None):
     """Save student records to a CSV file."""
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+
     if file_path is None:
         file_path = DEFAULT_DATA_FILE
 
@@ -87,6 +93,9 @@ def save_data(df, file_path=None):
 
 def get_column_summary(df):
     """Summarize each column's data type and missing values."""
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+
     return pd.DataFrame({
         "Column": df.columns,
         "Data_Type": [
