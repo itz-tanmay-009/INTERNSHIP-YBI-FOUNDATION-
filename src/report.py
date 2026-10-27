@@ -15,6 +15,13 @@ from analysis import (
 )
 
 
+DEFAULT_REPORT_FILE = (
+    Path(__file__).resolve().parent.parent
+    / "output"
+    / "student_performance_report.txt"
+)
+
+
 def generate_report(df):
     """Generate a detailed student performance report."""
     if df.empty:
@@ -119,7 +126,7 @@ def generate_report(df):
 
 def save_report(
     report_text,
-    output_file="output/student_performance_report.txt",
+    output_file=DEFAULT_REPORT_FILE,
 ):
     """Save the report as a UTF-8 text file."""
     path = Path(output_file)
@@ -130,7 +137,7 @@ def save_report(
 
 def generate_and_save_report(
     df,
-    output_file="output/student_performance_report.txt",
+    output_file=DEFAULT_REPORT_FILE,
 ):
     """Generate and save a report in one operation."""
     text = generate_report(df)
