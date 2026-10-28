@@ -45,7 +45,7 @@ def load_data(file_path=None):
         if not file_path.is_file():
             return create_sample_data()
 
-    file_path = Path(file_path)
+    file_path = Path(file_path).expanduser()
 
     if not file_path.is_file():
         raise FileNotFoundError(f"Dataset not found: {file_path}")
