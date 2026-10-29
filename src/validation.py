@@ -29,6 +29,9 @@ def normalize_data(df):
         column.strip() if isinstance(column, str) else column
         for column in df.columns
     ]
+    if any(column == "" for column in normalized_columns):
+        raise ValueError("Column names cannot be empty after trimming.")
+
     if pd.Index(normalized_columns).has_duplicates:
         raise ValueError(
             "Column names must be unique after trimming whitespace."
@@ -54,6 +57,12 @@ def validate_data(df):
 
     if not df.columns.is_unique:
         raise ValueError("Column names must be unique.")
+
+    if any(
+        isinstance(column, str) and not column.strip()
+        for column in df.columns
+    ):
+        raise ValueError("Column names cannot be blank.")
 
     if df.empty:
         raise ValueError("The dataset is empty.")
