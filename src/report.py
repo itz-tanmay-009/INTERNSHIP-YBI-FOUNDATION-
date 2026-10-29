@@ -2,6 +2,8 @@
 import math
 from pathlib import Path
 
+import pandas as pd
+
 from analysis import (
     calculate_averages,
     calculate_pass_percentage,
@@ -24,6 +26,9 @@ DEFAULT_REPORT_FILE = (
 
 def generate_report(df):
     """Generate a detailed student performance report."""
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+
     if df.empty:
         raise ValueError("Cannot generate a report from an empty dataset.")
 
@@ -129,9 +134,12 @@ def save_report(
     output_file=DEFAULT_REPORT_FILE,
 ):
     """Save the report as a UTF-8 text file."""
+    if not isinstance(report_text, str):
+        raise TypeError("Report content must be a string.")
+
     path = Path(output_file)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(report_text, encoding="utf-8")
+    path.write_text(report_text.rstrip() + "\n", encoding="utf-8")
     return path
 
 
