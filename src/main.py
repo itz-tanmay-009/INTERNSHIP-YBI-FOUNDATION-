@@ -126,6 +126,15 @@ def main(data_file=None, output_dir=None):
 
     print("\nAnalysis completed successfully.")
 
+    return {
+        "output_dir": output_dir,
+        "support_students": support_path,
+        "statistics": statistics_path,
+        "correlation": correlation_path,
+        "report": report_path,
+        "charts": chart_paths,
+    }
+
 
 if __name__ == "__main__":
     try:
