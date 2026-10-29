@@ -53,7 +53,11 @@ def load_data(file_path=None):
     if file_path.suffix.lower() != ".csv":
         raise ValueError("The dataset must be a CSV file.")
 
-    return pd.read_csv(file_path, encoding="utf-8-sig")
+    data = pd.read_csv(file_path, encoding="utf-8-sig")
+    if data.empty:
+        raise ValueError(f"The dataset is empty: {file_path}")
+
+    return data
 
 
 def get_dataset_overview(df):
