@@ -13,6 +13,8 @@ from analysis import (
     get_improvement_summary,
     get_correlation_matrix,
     get_score_distribution,
+    get_attendance_summary,
+    get_study_hours_summary,
     generate_insights,
 )
 
@@ -24,7 +26,7 @@ DEFAULT_REPORT_FILE = (
 )
 
 
-def generate_report(df):
+def generate_report(df: pd.DataFrame) -> str:
     """Generate a detailed student performance report."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
@@ -39,6 +41,8 @@ def generate_report(df):
     improvement = get_improvement_summary(df)
     score_distribution = get_score_distribution(df)
     correlations = get_correlation_matrix(df)
+    attendance = get_attendance_summary(df)
+    study = get_study_hours_summary(df)
 
     lines = [
         "=" * 60,
@@ -73,7 +77,22 @@ def generate_report(df):
         f"Unchanged students: {improvement['unchanged_students']}",
         f"Average mark change: {improvement['average_mark_change']:.2f}",
         "",
-        "4. PERFORMANCE CATEGORIES",
+        "4. ATTENDANCE AND STUDY HABITS",
+        "-" * 60,
+        f"Average attendance: {attendance['average_attendance']:.2f}%",
+        f"Median attendance: {attendance['median_attendance']:.2f}%",
+        (
+            "Students below 75% attendance: "
+            f"{attendance['low_attendance_students']}"
+        ),
+        f"Average study hours: {study['average_study_hours']:.2f}",
+        f"Median study hours: {study['median_study_hours']:.2f}",
+        (
+            "Students studying under 2 hours: "
+            f"{study['low_study_hours_students']}"
+        ),
+        "",
+        "5. PERFORMANCE CATEGORIES",
         "-" * 60,
     ]
 
@@ -82,7 +101,7 @@ def generate_report(df):
 
     lines.extend([
         "",
-        "5. FINAL MARKS DISTRIBUTION",
+        "6. FINAL MARKS DISTRIBUTION",
         "-" * 60,
     ])
 
@@ -93,7 +112,7 @@ def generate_report(df):
 
     lines.extend([
         "",
-        "6. CORRELATION WITH FINAL MARKS",
+        "7. CORRELATION WITH FINAL MARKS",
         "-" * 60,
     ])
 
@@ -107,7 +126,7 @@ def generate_report(df):
 
     lines.extend([
         "",
-        "7. AUTOMATED INSIGHTS",
+        "8. AUTOMATED INSIGHTS",
         "-" * 60,
     ])
 
@@ -132,7 +151,7 @@ def generate_report(df):
 def save_report(
     report_text,
     output_file=DEFAULT_REPORT_FILE,
-):
+) -> Path:
     """Save the report as a UTF-8 text file."""
     if not isinstance(report_text, str):
         raise TypeError("Report content must be a string.")
@@ -146,7 +165,7 @@ def save_report(
 def generate_and_save_report(
     df,
     output_file=DEFAULT_REPORT_FILE,
-):
+) -> Path:
     """Generate and save a report in one operation."""
     text = generate_report(df)
     return save_report(text, output_file)

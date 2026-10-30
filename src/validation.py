@@ -20,7 +20,7 @@ MARK_COLUMNS = [
 ]
 
 
-def normalize_data(df):
+def normalize_data(df: pd.DataFrame) -> pd.DataFrame:
     """Trim column-name whitespace and convert required fields to numbers."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
@@ -50,7 +50,7 @@ def normalize_data(df):
     return normalized
 
 
-def validate_data(df):
+def validate_data(df: pd.DataFrame) -> bool:
     """Validate student records and reject invalid data."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
@@ -67,10 +67,10 @@ def validate_data(df):
     if df.empty:
         raise ValueError("The dataset is empty.")
 
-    missing_columns = set(REQUIRED_COLUMNS) - set(df.columns)
+    missing_columns = sorted(set(REQUIRED_COLUMNS) - set(df.columns))
     if missing_columns:
         raise ValueError(
-            f"Missing required columns: {sorted(missing_columns)}"
+            f"Missing required columns: {missing_columns}"
         )
 
     data = df[REQUIRED_COLUMNS].copy()
@@ -109,7 +109,7 @@ def validate_data(df):
     return True
 
 
-def get_missing_value_summary(df):
+def get_missing_value_summary(df: pd.DataFrame) -> dict:
     """Count missing values in each column."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
@@ -117,7 +117,7 @@ def get_missing_value_summary(df):
     return df.isnull().sum().to_dict()
 
 
-def get_duplicate_summary(df):
+def get_duplicate_summary(df: pd.DataFrame) -> dict:
     """Count duplicate rows and duplicate student IDs."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
@@ -132,14 +132,12 @@ def get_duplicate_summary(df):
     }
 
 
-def get_data_quality_summary(df):
+def get_data_quality_summary(df: pd.DataFrame) -> dict:
     """Return a summary of common data quality issues."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
 
-    missing_columns = sorted(
-        set(REQUIRED_COLUMNS) - set(df.columns)
-    )
+    missing_columns = sorted(set(REQUIRED_COLUMNS) - set(df.columns))
 
     return {
         "total_records": int(len(df)),

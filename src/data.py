@@ -8,7 +8,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DATA_FILE = PROJECT_ROOT / "data" / "student_performance.csv"
 
 
-def create_sample_data():
+def create_sample_data() -> pd.DataFrame:
     """Create a sample dataset containing 20 student records."""
     data = {
         "Student_ID": list(range(1, 21)),
@@ -37,7 +37,7 @@ def create_sample_data():
     return pd.DataFrame(data)
 
 
-def load_data(file_path=None):
+def load_data(file_path=None) -> pd.DataFrame:
     """Load student records from a CSV file or use sample data."""
     if file_path is None:
         file_path = DEFAULT_DATA_FILE
@@ -53,14 +53,18 @@ def load_data(file_path=None):
     if file_path.suffix.lower() != ".csv":
         raise ValueError("The dataset must be a CSV file.")
 
-    data = pd.read_csv(file_path, encoding="utf-8-sig")
+    try:
+        data = pd.read_csv(file_path, encoding="utf-8-sig")
+    except (OSError, UnicodeDecodeError, pd.errors.ParserError) as error:
+        raise ValueError(f"Unable to read dataset: {file_path}") from error
+
     if data.empty:
         raise ValueError(f"The dataset is empty: {file_path}")
 
     return data
 
 
-def get_dataset_overview(df):
+def get_dataset_overview(df: pd.DataFrame) -> dict:
     """Return a concise overview of the dataset."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
@@ -77,7 +81,7 @@ def get_dataset_overview(df):
     }
 
 
-def save_data(df, file_path=None):
+def save_data(df: pd.DataFrame, file_path=None) -> Path:
     """Save student records to a CSV file."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
@@ -95,7 +99,7 @@ def save_data(df, file_path=None):
     return file_path
 
 
-def get_column_summary(df):
+def get_column_summary(df: pd.DataFrame) -> pd.DataFrame:
     """Summarize each column's data type and missing values."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")

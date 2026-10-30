@@ -1,8 +1,10 @@
 
+from typing import Final
+
 import pandas as pd
 
 
-PASS_MARK = 40
+PASS_MARK: Final = 40
 
 NUMERIC_COLUMNS = [
     "Study_Hours",
@@ -21,12 +23,12 @@ PERFORMANCE_LABELS = [
 ]
 
 
-def calculate_averages(df):
+def calculate_averages(df: pd.DataFrame) -> dict:
     """Calculate averages for numerical columns."""
     return df[NUMERIC_COLUMNS].mean().round(2).to_dict()
 
 
-def get_top_student(df):
+def get_top_student(df: pd.DataFrame) -> dict:
     """Return the highest-scoring student."""
     if df.empty:
         raise ValueError("No student records are available.")
@@ -35,7 +37,7 @@ def get_top_student(df):
     return df.iloc[position].to_dict()
 
 
-def get_lowest_student(df):
+def get_lowest_student(df: pd.DataFrame) -> dict:
     """Return the lowest-scoring student."""
     if df.empty:
         raise ValueError("No student records are available.")
@@ -44,7 +46,7 @@ def get_lowest_student(df):
     return df.iloc[position].to_dict()
 
 
-def find_top_three_students(df):
+def find_top_three_students(df: pd.DataFrame) -> pd.DataFrame:
     """Return the three students with the highest final marks."""
     return (
         df.sort_values(
@@ -57,7 +59,7 @@ def find_top_three_students(df):
     )
 
 
-def calculate_pass_percentage(df, pass_mark=PASS_MARK):
+def calculate_pass_percentage(df: pd.DataFrame, pass_mark: float = PASS_MARK) -> float:
     """Calculate the percentage of students who passed."""
     if not 0 <= pass_mark <= 100:
         raise ValueError("Pass mark must be between 0 and 100.")
@@ -69,7 +71,7 @@ def calculate_pass_percentage(df, pass_mark=PASS_MARK):
     return round(float(passed / len(df) * 100), 2)
 
 
-def compare_previous_and_final_marks(df):
+def compare_previous_and_final_marks(df: pd.DataFrame) -> pd.DataFrame:
     """Compare previous and final marks for each student."""
     result = df[
         ["Student_ID", "Previous_Marks", "Final_Marks"]
@@ -90,7 +92,7 @@ def compare_previous_and_final_marks(df):
     return result
 
 
-def calculate_average_improvement(df):
+def calculate_average_improvement(df: pd.DataFrame) -> float:
     """Calculate the average change in marks."""
     changes = compare_previous_and_final_marks(df)["Mark_Change"]
 
@@ -100,7 +102,7 @@ def calculate_average_improvement(df):
     return round(float(changes.mean()), 2)
 
 
-def get_improvement_summary(df):
+def get_improvement_summary(df: pd.DataFrame) -> dict:
     """Summarize improvements, declines, and unchanged marks."""
     changes = compare_previous_and_final_marks(df)["Mark_Change"]
 
@@ -116,7 +118,7 @@ def get_improvement_summary(df):
     }
 
 
-def get_performance_categories(df):
+def get_performance_categories(df: pd.DataFrame) -> pd.DataFrame:
     """Assign performance categories based on final marks."""
     result = df.copy()
 
@@ -131,7 +133,7 @@ def get_performance_categories(df):
     return result
 
 
-def get_grade_counts(df):
+def get_grade_counts(df: pd.DataFrame) -> dict:
     """Count students in each performance category."""
     categorized = get_performance_categories(df)
 
@@ -140,17 +142,17 @@ def get_grade_counts(df):
     ).to_dict()
 
 
-def get_correlation_matrix(df):
+def get_correlation_matrix(df: pd.DataFrame) -> pd.DataFrame:
     """Calculate correlations between numerical measures."""
     return df[NUMERIC_COLUMNS].corr().round(2)
 
 
-def get_descriptive_statistics(df):
+def get_descriptive_statistics(df: pd.DataFrame) -> pd.DataFrame:
     """Calculate descriptive statistics."""
     return df[NUMERIC_COLUMNS].describe().round(2)
 
 
-def get_attendance_summary(df):
+def get_attendance_summary(df: pd.DataFrame) -> dict:
     """Summarize attendance using mean and median."""
     attendance = df["Attendance"]
 
@@ -168,7 +170,7 @@ def get_attendance_summary(df):
     }
 
 
-def get_study_hours_summary(df):
+def get_study_hours_summary(df: pd.DataFrame) -> dict:
     """Summarize study hours and identify low study time."""
     hours = df["Study_Hours"]
 
@@ -186,7 +188,7 @@ def get_study_hours_summary(df):
     }
 
 
-def get_score_distribution(df):
+def get_score_distribution(df: pd.DataFrame) -> dict:
     """Count students within final-mark ranges."""
     marks = df["Final_Marks"]
 
@@ -198,7 +200,10 @@ def get_score_distribution(df):
     }
 
 
-def find_students_needing_support(df, pass_mark=PASS_MARK):
+def find_students_needing_support(
+    df: pd.DataFrame,
+    pass_mark: float = PASS_MARK,
+) -> pd.DataFrame:
     """Identify students scoring below the pass mark."""
     if not 0 <= pass_mark <= 100:
         raise ValueError("Pass mark must be between 0 and 100.")
@@ -216,7 +221,7 @@ def find_students_needing_support(df, pass_mark=PASS_MARK):
     return students.reset_index(drop=True)
 
 
-def get_student_performance_summary(df):
+def get_student_performance_summary(df: pd.DataFrame) -> dict:
     """Summarize students using the configured performance categories."""
     required_columns = {
         "Student_ID",
@@ -251,7 +256,7 @@ def get_student_performance_summary(df):
     }
 
 
-def get_student_performance_details(df):
+def get_student_performance_details(df: pd.DataFrame) -> pd.DataFrame:
     """Return performance, attendance, and study habit details."""
     required_columns = {
         "Student_ID",
@@ -297,7 +302,7 @@ def get_student_performance_details(df):
     ).reset_index(drop=True)
 
 
-def generate_insights(df):
+def generate_insights(df: pd.DataFrame) -> list[str]:
     """Generate readable findings from student records."""
     if df.empty:
         return ["No student records are available for analysis."]
