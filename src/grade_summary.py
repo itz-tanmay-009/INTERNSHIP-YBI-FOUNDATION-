@@ -10,7 +10,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "output"
 
 
-def create_grade_summary(df):
+def create_grade_summary(df: pd.DataFrame) -> pd.DataFrame:
     """Summarize student counts and percentages by performance category."""
     categorized = get_performance_categories(df)
 
@@ -33,7 +33,7 @@ def create_grade_summary(df):
     return summary
 
 
-def create_student_grade_details(df):
+def create_student_grade_details(df: pd.DataFrame) -> pd.DataFrame:
     """Return student IDs, final marks, and performance categories."""
     categorized = get_performance_categories(df)
 
@@ -50,7 +50,10 @@ def create_student_grade_details(df):
     ).reset_index(drop=True)
 
 
-def save_all_grade_summaries(df, output_dir=None):
+def save_all_grade_summaries(
+    df: pd.DataFrame,
+    output_dir: str | Path | None = None,
+) -> dict:
     """Save category summaries and student grade details to CSV."""
     if output_dir is None:
         output_dir = DEFAULT_OUTPUT_DIR
