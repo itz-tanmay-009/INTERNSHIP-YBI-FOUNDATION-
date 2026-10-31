@@ -149,8 +149,8 @@ def generate_report(df: pd.DataFrame) -> str:
 
 
 def save_report(
-    report_text,
-    output_file=DEFAULT_REPORT_FILE,
+    report_text: str,
+    output_file: str | Path = DEFAULT_REPORT_FILE,
 ) -> Path:
     """Save the report as a UTF-8 text file."""
     if not isinstance(report_text, str):
@@ -163,8 +163,8 @@ def save_report(
 
 
 def generate_and_save_report(
-    df,
-    output_file=DEFAULT_REPORT_FILE,
+    df: pd.DataFrame,
+    output_file: str | Path = DEFAULT_REPORT_FILE,
 ) -> Path:
     """Generate and save a report in one operation."""
     text = generate_report(df)
