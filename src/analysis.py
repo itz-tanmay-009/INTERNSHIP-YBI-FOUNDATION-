@@ -23,7 +23,7 @@ PERFORMANCE_LABELS = [
 ]
 
 
-def calculate_averages(df: pd.DataFrame) -> dict:
+def calculate_averages(df: pd.DataFrame) -> dict[str, float]:
     """Calculate averages for numerical columns."""
     return df[NUMERIC_COLUMNS].mean().round(2).to_dict()
 
