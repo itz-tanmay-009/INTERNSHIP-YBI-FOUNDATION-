@@ -55,7 +55,12 @@ def load_data(file_path=None) -> pd.DataFrame:
 
     try:
         data = pd.read_csv(file_path, encoding="utf-8-sig")
-    except (OSError, UnicodeDecodeError, pd.errors.ParserError) as error:
+    except (
+        OSError,
+        UnicodeDecodeError,
+        pd.errors.EmptyDataError,
+        pd.errors.ParserError,
+    ) as error:
         raise ValueError(f"Unable to read dataset: {file_path}") from error
 
     if data.empty:
@@ -85,6 +90,9 @@ def save_data(df: pd.DataFrame, file_path=None) -> Path:
     """Save student records to a CSV file."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
+
+    if df.empty:
+        raise ValueError("Cannot save an empty dataset.")
 
     if file_path is None:
         file_path = DEFAULT_DATA_FILE
