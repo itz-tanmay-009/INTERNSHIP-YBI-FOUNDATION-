@@ -27,7 +27,10 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = PROJECT_ROOT / "output"
 
 
-def main(data_file=None, output_dir=None):
+def main(
+    data_file: str | Path | None = None,
+    output_dir: str | Path | None = None,
+) -> dict:
     """Run the complete student performance analysis project."""
     output_dir = OUTPUT_DIR if output_dir is None else Path(output_dir)
 
