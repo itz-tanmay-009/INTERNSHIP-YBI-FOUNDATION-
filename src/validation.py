@@ -109,7 +109,7 @@ def validate_data(df: pd.DataFrame) -> bool:
     return True
 
 
-def get_missing_value_summary(df: pd.DataFrame) -> dict:
+def get_missing_value_summary(df: pd.DataFrame) -> dict[str, int]:
     """Count missing values in each column."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
@@ -117,7 +117,7 @@ def get_missing_value_summary(df: pd.DataFrame) -> dict:
     return df.isnull().sum().to_dict()
 
 
-def get_duplicate_summary(df: pd.DataFrame) -> dict:
+def get_duplicate_summary(df: pd.DataFrame) -> dict[str, int]:
     """Count duplicate rows and duplicate student IDs."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
