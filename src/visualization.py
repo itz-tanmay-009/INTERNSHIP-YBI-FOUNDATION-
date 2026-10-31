@@ -12,7 +12,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "output" / "charts"
 
 
-def create_output_directory(output_dir=None):
+def create_output_directory(
+    output_dir: str | Path | None = None,
+) -> Path:
     """Create the directory used to store charts."""
     if output_dir is None:
         output_dir = DEFAULT_OUTPUT_DIR
@@ -22,7 +24,7 @@ def create_output_directory(output_dir=None):
     return output_dir
 
 
-def _save_chart(fig, output_dir, filename):
+def _save_chart(fig, output_dir: Path, filename: str) -> Path:
     path = output_dir / filename
     try:
         fig.tight_layout()
