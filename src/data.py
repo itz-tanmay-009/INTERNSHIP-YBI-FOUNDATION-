@@ -37,7 +37,7 @@ def create_sample_data() -> pd.DataFrame:
     return pd.DataFrame(data)
 
 
-def load_data(file_path=None) -> pd.DataFrame:
+def load_data(file_path: str | Path | None = None) -> pd.DataFrame:
     """Load student records from a CSV file or use sample data."""
     if file_path is None:
         file_path = DEFAULT_DATA_FILE
@@ -86,7 +86,10 @@ def get_dataset_overview(df: pd.DataFrame) -> dict:
     }
 
 
-def save_data(df: pd.DataFrame, file_path=None) -> Path:
+def save_data(
+    df: pd.DataFrame,
+    file_path: str | Path | None = None,
+) -> Path:
     """Save student records to a CSV file."""
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
