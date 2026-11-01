@@ -10,8 +10,21 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "output"
 
 
+def _validate_summary_input(df: pd.DataFrame) -> None:
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+
+    required_columns = {"Student_ID", "Final_Marks"}
+    missing_columns = sorted(required_columns - set(df.columns))
+    if missing_columns:
+        raise ValueError(
+            f"Missing required columns: {missing_columns}"
+        )
+
+
 def create_grade_summary(df: pd.DataFrame) -> pd.DataFrame:
     """Summarize student counts and percentages by performance category."""
+    _validate_summary_input(df)
     categorized = get_performance_categories(df)
 
     summary = (
@@ -35,6 +48,7 @@ def create_grade_summary(df: pd.DataFrame) -> pd.DataFrame:
 
 def create_student_grade_details(df: pd.DataFrame) -> pd.DataFrame:
     """Return student IDs, final marks, and performance categories."""
+    _validate_summary_input(df)
     categorized = get_performance_categories(df)
 
     columns = [
@@ -53,8 +67,9 @@ def create_student_grade_details(df: pd.DataFrame) -> pd.DataFrame:
 def save_all_grade_summaries(
     df: pd.DataFrame,
     output_dir: str | Path | None = None,
-) -> dict:
+) -> dict[str, pd.DataFrame | Path]:
     """Save category summaries and student grade details to CSV."""
+    _validate_summary_input(df)
     if output_dir is None:
         output_dir = DEFAULT_OUTPUT_DIR
 

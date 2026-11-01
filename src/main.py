@@ -1,5 +1,6 @@
 
 from pathlib import Path
+from typing import Any
 
 from data import load_data
 from validation import (
@@ -30,9 +31,13 @@ OUTPUT_DIR = PROJECT_ROOT / "output"
 def main(
     data_file: str | Path | None = None,
     output_dir: str | Path | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """Run the complete student performance analysis project."""
-    output_dir = OUTPUT_DIR if output_dir is None else Path(output_dir)
+    output_dir = (
+        OUTPUT_DIR
+        if output_dir is None
+        else Path(output_dir).expanduser()
+    )
 
     print("=" * 55)
     print("STUDENT PERFORMANCE ANALYSIS")

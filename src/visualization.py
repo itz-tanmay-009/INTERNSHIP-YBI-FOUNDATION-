@@ -34,8 +34,28 @@ def _save_chart(fig, output_dir: Path, filename: str) -> Path:
     return path
 
 
-def create_marks_comparison_chart(df, output_dir=None):
+def _validate_chart_input(df: pd.DataFrame, required_columns: set[str]) -> None:
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+    if df.empty:
+        raise ValueError("Cannot create charts from an empty dataset.")
+
+    missing_columns = required_columns - set(df.columns)
+    if missing_columns:
+        raise ValueError(
+            f"Missing required columns: {sorted(missing_columns)}"
+        )
+
+
+def create_marks_comparison_chart(
+    df: pd.DataFrame,
+    output_dir: str | Path | None = None,
+) -> Path:
     """Compare average marks across assessment categories."""
+    _validate_chart_input(
+        df,
+        {"Previous_Marks", "Assignment_Marks", "Final_Marks"},
+    )
     output_dir = create_output_directory(output_dir)
 
     columns = ["Previous_Marks", "Assignment_Marks", "Final_Marks"]
@@ -53,8 +73,12 @@ def create_marks_comparison_chart(df, output_dir=None):
     return _save_chart(fig, output_dir, "marks_comparison.png")
 
 
-def create_study_hours_chart(df, output_dir=None):
+def create_study_hours_chart(
+    df: pd.DataFrame,
+    output_dir: str | Path | None = None,
+) -> Path:
     """Show study hours for each student."""
+    _validate_chart_input(df, {"Student_ID", "Study_Hours"})
     output_dir = create_output_directory(output_dir)
 
     fig, ax = plt.subplots(figsize=(10, 5))
@@ -68,8 +92,12 @@ def create_study_hours_chart(df, output_dir=None):
     return _save_chart(fig, output_dir, "study_hours.png")
 
 
-def create_attendance_chart(df, output_dir=None):
+def create_attendance_chart(
+    df: pd.DataFrame,
+    output_dir: str | Path | None = None,
+) -> Path:
     """Show attendance percentages for each student."""
+    _validate_chart_input(df, {"Student_ID", "Attendance"})
     output_dir = create_output_directory(output_dir)
 
     fig, ax = plt.subplots(figsize=(10, 5))
@@ -84,8 +112,12 @@ def create_attendance_chart(df, output_dir=None):
     return _save_chart(fig, output_dir, "attendance.png")
 
 
-def create_marks_distribution_chart(df, output_dir=None):
+def create_marks_distribution_chart(
+    df: pd.DataFrame,
+    output_dir: str | Path | None = None,
+) -> Path:
     """Display the distribution of final marks."""
+    _validate_chart_input(df, {"Final_Marks"})
     output_dir = create_output_directory(output_dir)
 
     fig, ax = plt.subplots(figsize=(8, 5))
@@ -104,8 +136,12 @@ def create_marks_distribution_chart(df, output_dir=None):
     return _save_chart(fig, output_dir, "marks_distribution.png")
 
 
-def create_study_vs_marks_chart(df, output_dir=None):
+def create_study_vs_marks_chart(
+    df: pd.DataFrame,
+    output_dir: str | Path | None = None,
+) -> Path:
     """Explore the relationship between study hours and final marks."""
+    _validate_chart_input(df, {"Study_Hours", "Final_Marks"})
     output_dir = create_output_directory(output_dir)
 
     fig, ax = plt.subplots(figsize=(8, 5))
@@ -119,14 +155,11 @@ def create_study_vs_marks_chart(df, output_dir=None):
     return _save_chart(fig, output_dir, "study_vs_marks.png")
 
 
-def create_all_charts(df, output_dir=None):
+def create_all_charts(
+    df: pd.DataFrame,
+    output_dir: str | Path | None = None,
+) -> dict[str, Path]:
     """Generate all student performance charts."""
-    if not isinstance(df, pd.DataFrame):
-        raise TypeError("Input must be a pandas DataFrame.")
-
-    if df.empty:
-        raise ValueError("Cannot create charts from an empty dataset.")
-
     required_columns = {
         "Student_ID",
         "Study_Hours",
@@ -135,11 +168,7 @@ def create_all_charts(df, output_dir=None):
         "Assignment_Marks",
         "Final_Marks",
     }
-    missing_columns = required_columns - set(df.columns)
-    if missing_columns:
-        raise ValueError(
-            f"Missing required columns: {sorted(missing_columns)}"
-        )
+    _validate_chart_input(df, required_columns)
 
     output_dir = create_output_directory(output_dir)
 

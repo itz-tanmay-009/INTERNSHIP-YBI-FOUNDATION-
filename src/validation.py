@@ -20,10 +20,14 @@ MARK_COLUMNS = [
 ]
 
 
-def normalize_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Trim column-name whitespace and convert required fields to numbers."""
+def _require_dataframe(df: pd.DataFrame) -> None:
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame.")
+
+
+def normalize_data(df: pd.DataFrame) -> pd.DataFrame:
+    """Trim column-name whitespace and convert required fields to numbers."""
+    _require_dataframe(df)
 
     normalized_columns = [
         column.strip() if isinstance(column, str) else column
@@ -52,8 +56,7 @@ def normalize_data(df: pd.DataFrame) -> pd.DataFrame:
 
 def validate_data(df: pd.DataFrame) -> bool:
     """Validate student records and reject invalid data."""
-    if not isinstance(df, pd.DataFrame):
-        raise TypeError("Input must be a pandas DataFrame.")
+    _require_dataframe(df)
 
     if not df.columns.is_unique:
         raise ValueError("Column names must be unique.")
@@ -111,16 +114,14 @@ def validate_data(df: pd.DataFrame) -> bool:
 
 def get_missing_value_summary(df: pd.DataFrame) -> dict[str, int]:
     """Count missing values in each column."""
-    if not isinstance(df, pd.DataFrame):
-        raise TypeError("Input must be a pandas DataFrame.")
+    _require_dataframe(df)
 
     return df.isnull().sum().to_dict()
 
 
 def get_duplicate_summary(df: pd.DataFrame) -> dict[str, int]:
     """Count duplicate rows and duplicate student IDs."""
-    if not isinstance(df, pd.DataFrame):
-        raise TypeError("Input must be a pandas DataFrame.")
+    _require_dataframe(df)
 
     return {
         "duplicate_rows": int(df.duplicated().sum()),
@@ -134,8 +135,7 @@ def get_duplicate_summary(df: pd.DataFrame) -> dict[str, int]:
 
 def get_data_quality_summary(df: pd.DataFrame) -> dict:
     """Return a summary of common data quality issues."""
-    if not isinstance(df, pd.DataFrame):
-        raise TypeError("Input must be a pandas DataFrame.")
+    _require_dataframe(df)
 
     missing_columns = sorted(set(REQUIRED_COLUMNS) - set(df.columns))
 
