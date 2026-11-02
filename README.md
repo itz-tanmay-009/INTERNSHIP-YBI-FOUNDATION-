@@ -28,21 +28,23 @@ Student_Performance_Analysis/
 │   └── student_performance.csv
 ├── notebook/
 │   └── Student_Performance_Analysis.ipynb
-├── output/
+├── output/                         # Generated reports and charts
 ├── src/
-│   ├── main.py
-│   ├── data.py
-│   ├── validation.py
-│   ├── analysis.py
-│   ├── grade_summary.py
-│   ├── visualization.py
-│   └── report.py
+│   ├── main.py                    # Analysis entry point
+│   ├── data.py                    # Dataset loading and saving
+│   ├── validation.py              # Data validation and quality checks
+│   ├── analysis.py                # Performance calculations
+│   ├── grade_summary.py           # Grade-wise summaries
+│   ├── visualization.py           # Chart generation
+│   └── report.py                  # Report generation
 ├── requirements.txt
 ├── .gitignore
 └── README.md
 ```
 
-*Note: Some folders and generated files may appear only after running the project.*
+The `output/` directory is created for generated CSV summaries, charts, and
+reports when the analysis is run. The tracked `.gitkeep` file preserves the
+directory in the repository before the first run.
 
 ## Features
 
