@@ -21,6 +21,9 @@ def _validate_summary_input(df: pd.DataFrame) -> None:
             f"Missing required columns: {missing_columns}"
         )
 
+    if df.empty:
+        raise ValueError("Cannot create grade summaries from an empty dataset.")
+
 
 def create_grade_summary(df: pd.DataFrame) -> pd.DataFrame:
     """Summarize student counts and percentages by performance category."""
