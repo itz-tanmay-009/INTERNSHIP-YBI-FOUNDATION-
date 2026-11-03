@@ -46,6 +46,20 @@ def _validate_chart_input(df: pd.DataFrame, required_columns: set[str]) -> None:
             f"Missing required columns: {sorted(missing_columns)}"
         )
 
+    numeric_columns = df[list(required_columns)].select_dtypes(
+        include="number"
+    ).columns
+    non_numeric_columns = required_columns - set(numeric_columns)
+    if non_numeric_columns:
+        raise ValueError(
+            f"Chart columns must be numeric: {sorted(non_numeric_columns)}"
+        )
+
+    if not df[list(required_columns)].apply(
+        lambda column: column.map(pd.api.types.is_number).all()
+    ).all():
+        raise ValueError("Chart data contains non-numeric values.")
+
 
 def create_marks_comparison_chart(
     df: pd.DataFrame,
