@@ -36,7 +36,7 @@ def main(
     output_dir = (
         OUTPUT_DIR
         if output_dir is None
-        else Path(output_dir).expanduser()
+        else Path(output_dir).expanduser().resolve()
     )
 
     print("=" * 55)
@@ -101,7 +101,7 @@ def main(
     print("\nGENERATING OUTPUT FILES")
     print("-" * 35)
 
-    save_all_grade_summaries(df, output_dir)
+    grade_summary_paths = save_all_grade_summaries(df, output_dir)
 
     statistics_path = output_dir / "descriptive_statistics.csv"
     get_descriptive_statistics(df).to_csv(
@@ -141,6 +141,7 @@ def main(
         "correlation": correlation_path,
         "report": report_path,
         "charts": chart_paths,
+        "grade_summaries": grade_summary_paths,
     }
 
 
