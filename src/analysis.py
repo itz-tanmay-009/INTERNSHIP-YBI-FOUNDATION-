@@ -23,13 +23,26 @@ PERFORMANCE_LABELS = [
 ]
 
 
+def _require_columns(df: pd.DataFrame, required_columns: set[str]) -> None:
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame.")
+
+    missing_columns = required_columns - set(df.columns)
+    if missing_columns:
+        raise ValueError(
+            f"Missing required columns: {sorted(missing_columns)}"
+        )
+
+
 def calculate_averages(df: pd.DataFrame) -> dict[str, float]:
     """Calculate averages for numerical columns."""
+    _require_columns(df, set(NUMERIC_COLUMNS))
     return df[NUMERIC_COLUMNS].mean().round(2).to_dict()
 
 
 def get_top_student(df: pd.DataFrame) -> dict:
     """Return the highest-scoring student."""
+    _require_columns(df, {"Final_Marks"})
     if df.empty:
         raise ValueError("No student records are available.")
 
@@ -39,6 +52,7 @@ def get_top_student(df: pd.DataFrame) -> dict:
 
 def get_lowest_student(df: pd.DataFrame) -> dict:
     """Return the lowest-scoring student."""
+    _require_columns(df, {"Final_Marks"})
     if df.empty:
         raise ValueError("No student records are available.")
 
@@ -61,6 +75,7 @@ def find_top_three_students(df: pd.DataFrame) -> pd.DataFrame:
 
 def calculate_pass_percentage(df: pd.DataFrame, pass_mark: float = PASS_MARK) -> float:
     """Calculate the percentage of students who passed."""
+    _require_columns(df, {"Final_Marks"})
     if not 0 <= pass_mark <= 100:
         raise ValueError("Pass mark must be between 0 and 100.")
 
