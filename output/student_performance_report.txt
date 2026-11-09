@@ -1,0 +1,81 @@
+============================================================
+STUDENT PERFORMANCE ANALYSIS REPORT
+============================================================
+
+1. DATASET SUMMARY
+------------------------------------------------------------
+Total students: 20
+Average study hours: 3.80
+Average attendance: 80.55%
+Average previous marks: 61.90
+Average assignment marks: 66.80
+Average final marks: 71.95
+
+2. EXAM RESULTS
+------------------------------------------------------------
+Pass percentage: 100.00%
+Highest scorer: Student 15, 97 marks
+Lowest scorer: Student 7, 47 marks
+
+3. MARK IMPROVEMENT
+------------------------------------------------------------
+Improved students: 20
+Declined students: 0
+Unchanged students: 0
+Average mark change: 10.05
+
+4. ATTENDANCE AND STUDY HABITS
+------------------------------------------------------------
+Average attendance: 80.55%
+Median attendance: 81.00%
+Students below 75% attendance: 5
+Average study hours: 3.80
+Median study hours: 3.50
+Students studying under 2 hours: 2
+
+5. PERFORMANCE CATEGORIES
+------------------------------------------------------------
+Needs Improvement: 0 students
+Satisfactory: 4 students
+Good: 9 students
+Excellent: 7 students
+
+6. FINAL MARKS DISTRIBUTION
+------------------------------------------------------------
+Below 40: 0 students
+40 to 59: 4 students
+60 to 79: 9 students
+80 to 100: 7 students
+
+7. CORRELATION WITH FINAL MARKS
+------------------------------------------------------------
+Study_Hours: 0.97
+Attendance: 0.97
+Previous_Marks: 1.00
+Assignment_Marks: 1.00
+
+8. AUTOMATED INSIGHTS
+------------------------------------------------------------
+- Total students analyzed: 20
+- Average final marks: 71.95
+- Average study hours: 3.80
+- Average attendance: 80.55%
+- Pass percentage: 100.00%
+- Median final marks: 71.00
+- Students who improved: 20
+- Students who declined: 0
+- Average mark change: 10.05
+- Students below 40 marks: 0
+- Students below 75% attendance: 5
+- Students studying under 2 hours: 2
+- Highest scorer: Student 15, 97 marks
+
+NOTES
+------------------------------------------------------------
+Correlation does not prove cause and effect.
+Results depend on the quality of the dataset.
+Sample data may not represent real student performance.
+
+============================================================
+END OF REPORT
+============================================================
